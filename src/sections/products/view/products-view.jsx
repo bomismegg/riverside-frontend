@@ -6,7 +6,7 @@ import Container from '@mui/material/Container';
 import Grid from '@mui/material/Unstable_Grid2';
 import Typography from '@mui/material/Typography';
 
-import { products } from 'src/_mock/products';
+import { products } from 'src/api/products';
 
 import ProductCard from '../product-card';
 import ProductSort from '../product-sort';

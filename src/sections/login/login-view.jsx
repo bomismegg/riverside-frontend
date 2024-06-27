@@ -1,4 +1,7 @@
+import axios from 'axios';
 import { useState } from 'react';
+import 'react-toastify/dist/ReactToastify.css';
+import { toast, ToastContainer } from 'react-toastify';
 
 import Box from '@mui/material/Box';
 import Link from '@mui/material/Link';
@@ -24,24 +27,60 @@ import Iconify from 'src/components/iconify';
 
 export default function LoginView() {
   const theme = useTheme();
-
   const router = useRouter();
 
   const [showPassword, setShowPassword] = useState(false);
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [loading, setLoading] = useState(false);
 
-  const handleClick = () => {
-    router.push('/dashboard');
+  const handleSubmit = async (event) => {
+    event.preventDefault();
+    setLoading(true);
+
+    try {
+      const response = await axios.post('http://localhost:8080/account/login', {
+        email,
+        password,
+      });
+
+      const { access_token, refresh_token } = response.data.content;
+
+      localStorage.setItem('access_token', access_token);
+      localStorage.setItem('refresh_token', refresh_token);
+
+      toast.success('Login successful!', {
+        position: "top-right"
+      });
+
+      setTimeout(() => {
+        router.push('/');
+      }, 1000);
+    } catch (err) {
+      toast.error('Login failed. Please check your credentials.', {
+        position: "top-right",
+      });
+    } finally {
+      setLoading(false);
+    }
   };
 
   const renderForm = (
-    <>
+    <form onSubmit={handleSubmit}>
       <Stack spacing={3}>
-        <TextField name="email" label="Email address" />
-
+        <TextField 
+          name="email" 
+          label="Email address" 
+          value={email} 
+          onChange={(e) => setEmail(e.target.value)}
+          required
+        />
         <TextField
           name="password"
           label="Password"
           type={showPassword ? 'text' : 'password'}
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
           InputProps={{
             endAdornment: (
               <InputAdornment position="end">
@@ -51,6 +90,7 @@ export default function LoginView() {
               </InputAdornment>
             ),
           }}
+          required
         />
       </Stack>
 
@@ -66,11 +106,11 @@ export default function LoginView() {
         type="submit"
         variant="contained"
         color="inherit"
-        onClick={handleClick}
+        loading={loading}
       >
         Login
       </LoadingButton>
-    </>
+    </form>
   );
 
   return (
@@ -99,7 +139,7 @@ export default function LoginView() {
             maxWidth: 420,
           }}
         >
-          <Typography variant="h4">Sign in to Minimal</Typography>
+          <Typography variant="h4">Sign in to Riverside Admin</Typography>
 
           <Typography variant="body2" sx={{ mt: 2, mb: 5 }}>
             Don’t have an account?
@@ -149,6 +189,7 @@ export default function LoginView() {
           {renderForm}
         </Card>
       </Stack>
+      <ToastContainer />
     </Box>
   );
 }

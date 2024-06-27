@@ -18,3 +18,7 @@ root.render(
     </BrowserRouter>
   </HelmetProvider>
 );
+
+//----------------
+// PROFILE PAGE //
+//----------------

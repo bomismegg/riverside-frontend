@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 import Card from '@mui/material/Card';
 import Stack from '@mui/material/Stack';
@@ -9,8 +9,9 @@ import TableBody from '@mui/material/TableBody';
 import Typography from '@mui/material/Typography';
 import TableContainer from '@mui/material/TableContainer';
 import TablePagination from '@mui/material/TablePagination';
+import { TableRow, TableCell, CircularProgress } from '@mui/material';
 
-import { users } from 'src/_mock/user';
+import { fetchUsers } from 'src/api/user';
 
 import Iconify from 'src/components/iconify';
 import Scrollbar from 'src/components/scrollbar';
@@ -25,17 +26,29 @@ import { emptyRows, applyFilter, getComparator } from '../utils';
 // ----------------------------------------------------------------------
 
 export default function UserPage() {
+  const [users, setUsers] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [page, setPage] = useState(0);
-
   const [order, setOrder] = useState('asc');
-
   const [selected, setSelected] = useState([]);
-
-  const [orderBy, setOrderBy] = useState('name');
-
+  const [orderBy, setOrderBy] = useState('fullName');
   const [filterName, setFilterName] = useState('');
-
   const [rowsPerPage, setRowsPerPage] = useState(5);
+
+  useEffect(() => {
+    const getUsers = async () => {
+      try {
+        const data = await fetchUsers();
+        setUsers(data.content);
+      } catch (error) {
+        console.error("Failed to fetch users:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    getUsers();
+  }, []);
 
   const handleSort = (event, id) => {
     const isAsc = orderBy === id && order === 'asc';
@@ -47,7 +60,7 @@ export default function UserPage() {
 
   const handleSelectAllClick = (event) => {
     if (event.target.checked) {
-      const newSelecteds = users.map((n) => n.name);
+      const newSelecteds = users.map((n) => n.fullName);
       setSelected(newSelecteds);
       return;
     }
@@ -122,30 +135,39 @@ export default function UserPage() {
                 onRequestSort={handleSort}
                 onSelectAllClick={handleSelectAllClick}
                 headLabel={[
-                  { id: 'name', label: 'Name' },
-                  { id: 'company', label: 'Company' },
+                  { id: 'fullName', label: 'Name' },
+                  { id: 'email', label: 'Email' },
                   { id: 'role', label: 'Role' },
-                  { id: 'isVerified', label: 'Verified', align: 'center' },
+                  { id: 'isAvailable', label: 'Available', align: 'center' },
                   { id: 'status', label: 'Status' },
                   { id: '' },
                 ]}
               />
               <TableBody>
-                {dataFiltered
-                  .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-                  .map((row) => (
-                    <UserTableRow
-                      key={row.id}
-                      name={row.name}
-                      role={row.role}
-                      status={row.status}
-                      company={row.company}
-                      avatarUrl={row.avatarUrl}
-                      isVerified={row.isVerified}
-                      selected={selected.indexOf(row.name) !== -1}
-                      handleClick={(event) => handleClick(event, row.name)}
-                    />
-                  ))}
+                {loading ? (
+                  <TableRow>
+                    <TableCell colSpan={6} align="center">
+                      <CircularProgress />
+                    </TableCell>
+                  </TableRow>
+                ) : (
+                  dataFiltered
+                    .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+                    .map((row) => (
+                      <UserTableRow
+                        key={row.userId}
+                        name={row.fullName}
+                        email={row.email}
+                        role={row.role}
+                        status={row.isEnable ? 'Enabled' : 'Disabled'}
+                        company={row.address}
+                        avatarUrl={row.imageURL}
+                        isVerified={row.isAvailable}
+                        selected={selected.indexOf(row.fullName) !== -1}
+                        handleClick={(event) => handleClick(event, row.fullName)}
+                      />
+                    ))
+                )}
 
                 <TableEmptyRows
                   height={77}
