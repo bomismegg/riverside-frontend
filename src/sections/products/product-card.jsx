@@ -1,22 +1,45 @@
+import { useState } from 'react';
 import PropTypes from 'prop-types';
 
 import Box from '@mui/material/Box';
 import Link from '@mui/material/Link';
 import Card from '@mui/material/Card';
+import Menu from '@mui/material/Menu';
 import Stack from '@mui/material/Stack';
+import MenuItem from '@mui/material/MenuItem';
 import Typography from '@mui/material/Typography';
+import IconButton from '@mui/material/IconButton';
 
 import { fCurrency } from 'src/utils/format-number';
 
 import Label from 'src/components/label';
 
-// ----------------------------------------------------------------------
+export default function ProductCard({ product, onEdit, onToggleAvailability }) {
+  const [anchorEl, setAnchorEl] = useState(null);
+  const open = Boolean(anchorEl);
 
-export default function ShopProductCard({ product, onClick }) {
+  const handleClick = (event) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleClose = () => {
+    setAnchorEl(null);
+  };
+
+  const handleEdit = () => {
+    onEdit(product);
+    handleClose();
+  };
+
+  const handleToggleAvailability = () => {
+    onToggleAvailability(product.dishId, !product.isAvailable);
+    handleClose();
+  };
+
   const renderStatus = (
     <Label
       variant="filled"
-      color={(product.status === 'sale' && 'error') || 'info'}
+      color={product.isAvailable ? 'success' : 'error'}
       sx={{
         zIndex: 9,
         top: 16,
@@ -25,7 +48,7 @@ export default function ShopProductCard({ product, onClick }) {
         textTransform: 'uppercase',
       }}
     >
-      {product.status}
+      {product.isAvailable ? 'Available' : 'Unavailable'}
     </Label>
   );
 
@@ -33,7 +56,7 @@ export default function ShopProductCard({ product, onClick }) {
     <Box
       component="img"
       alt={product.name}
-      src={product.cover}
+      src={product.imageURL}
       sx={{
         top: 0,
         width: 1,
@@ -46,25 +69,14 @@ export default function ShopProductCard({ product, onClick }) {
 
   const renderPrice = (
     <Typography variant="subtitle1">
-      <Typography
-        component="span"
-        variant="body1"
-        sx={{
-          color: 'text.disabled',
-          textDecoration: 'line-through',
-        }}
-      >
-        {product.priceSale && fCurrency(product.priceSale)}
-      </Typography>
-      &nbsp;
-      {fCurrency(product.price)}
+      {fCurrency(product.dishPrice)}
     </Typography>
   );
 
   return (
-    <Card onClick={onClick}>
+    <Card>
       <Box sx={{ pt: '100%', position: 'relative' }}>
-        {product.status && renderStatus}
+        {renderStatus}
         {renderImg}
       </Box>
       <Stack spacing={2} sx={{ p: 3 }}>
@@ -73,13 +85,38 @@ export default function ShopProductCard({ product, onClick }) {
         </Link>
         <Stack direction="row" alignItems="center" justifyContent="space-between">
           {renderPrice}
+          <IconButton
+            aria-label="more"
+            id="long-button"
+            aria-controls={open ? 'long-menu' : undefined}
+            aria-expanded={open ? 'true' : undefined}
+            aria-haspopup="true"
+            onClick={handleClick}
+          >
+            {/* <MoreVertIcon /> */}
+          </IconButton>
+          <Menu
+            id="long-menu"
+            MenuListProps={{
+              'aria-labelledby': 'long-button',
+            }}
+            anchorEl={anchorEl}
+            open={open}
+            onClose={handleClose}
+          >
+            <MenuItem onClick={handleEdit}>Edit</MenuItem>
+            <MenuItem onClick={handleToggleAvailability}>
+              {product.isAvailable ? 'Disable' : 'Enable'}
+            </MenuItem>
+          </Menu>
         </Stack>
       </Stack>
     </Card>
   );
 }
 
-ShopProductCard.propTypes = {
-  product: PropTypes.object,
-  onClick: PropTypes.func,
+ProductCard.propTypes = {
+  product: PropTypes.object.isRequired,
+  onEdit: PropTypes.func.isRequired,
+  onToggleAvailability: PropTypes.func.isRequired,
 };

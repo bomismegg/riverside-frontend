@@ -119,7 +119,7 @@ export default function UserPage() {
 
       <Card>
         <UserTableToolbar
-          numSelected={selected.length}
+          numSelected={selected.length} 
           filterName={filterName}
           onFilterName={handleFilterByName}
         />

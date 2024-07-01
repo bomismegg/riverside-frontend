@@ -1,32 +1,30 @@
-// ProductDetail.jsx
 import PropTypes from 'prop-types';
 import React, { useState } from 'react';
 
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
-import MenuItem from '@mui/material/MenuItem';
+import Switch from '@mui/material/Switch';
 import Grid from '@mui/material/Unstable_Grid2';
 import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
-
-const statuses = [
-    { value: 'sale', label: 'Sale' },
-    { value: 'new', label: 'New' },
-    { value: 'out of stock', label: 'Out of Stock' },
-];
+import FormControlLabel from '@mui/material/FormControlLabel';
 
 export default function ProductDetail({ product, onUpdate }) {
     const [formData, setFormData] = useState({
+        dishId: product.dishId,
         name: product.name,
-        price: product.price,
-        priceSale: product.priceSale,
-        status: product.status,
-        cover: product.cover,
+        dishPrice: product.dishPrice,
+        isAvailable: product.isAvailable,
+        imageURL: product.imageURL,
+        dishCategoryId: product.dishCategoryId,
     });
 
     const handleChange = (event) => {
-        const { name, value } = event.target;
-        setFormData({ ...formData, [name]: value });
+        const { name, value, checked } = event.target;
+        setFormData({ 
+            ...formData, 
+            [name]: name === 'isAvailable' ? checked : value 
+        });
     };
 
     const handleSubmit = (event) => {
@@ -46,7 +44,7 @@ export default function ProductDetail({ product, onUpdate }) {
                 <Box
                     component="img"
                     alt={formData.name}
-                    src={formData.cover}
+                    src={formData.imageURL}
                     sx={{
                         width: '100%',
                         height: 'auto',
@@ -67,45 +65,39 @@ export default function ProductDetail({ product, onUpdate }) {
                     margin="normal"
                 />
                 <TextField
-                    name="price"
+                    name="dishPrice"
                     label="Price"
-                    value={formData.price}
+                    value={formData.dishPrice}
                     onChange={handleChange}
                     type="number"
                     fullWidth
                     margin="normal"
                 />
                 <TextField
-                    name="priceSale"
-                    label="Sale Price"
-                    value={formData.priceSale}
+                    name="imageURL"
+                    label="Image URL"
+                    value={formData.imageURL}
                     onChange={handleChange}
-                    type="number"
                     fullWidth
                     margin="normal"
                 />
                 <TextField
-                    name="status"
-                    label="Status"
-                    select
-                    value={formData.status}
+                    name="dishCategoryId"
+                    label="Category ID"
+                    value={formData.dishCategoryId}
                     onChange={handleChange}
                     fullWidth
                     margin="normal"
-                >
-                    {statuses.map((option) => (
-                        <MenuItem key={option.value} value={option.value}>
-                            {option.label}
-                        </MenuItem>
-                    ))}
-                </TextField>
-                <TextField
-                    name="cover"
-                    label="Cover Image URL"
-                    value={formData.cover}
-                    onChange={handleChange}
-                    fullWidth
-                    margin="normal"
+                />
+                <FormControlLabel
+                    control={
+                        <Switch
+                            checked={formData.isAvailable}
+                            onChange={handleChange}
+                            name="isAvailable"
+                        />
+                    }
+                    label="Available"
                 />
                 <Box sx={{ mt: 2 }}>
                     <Button type="submit" variant="contained">

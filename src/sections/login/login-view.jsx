@@ -1,4 +1,3 @@
-import axios from 'axios';
 import { useState } from 'react';
 import 'react-toastify/dist/ReactToastify.css';
 import { toast, ToastContainer } from 'react-toastify';
@@ -18,6 +17,7 @@ import InputAdornment from '@mui/material/InputAdornment';
 
 import { useRouter } from 'src/routes/hooks';
 
+import { login } from 'src/api/user';
 import { bgGradient } from 'src/theme/css';
 
 import Logo from 'src/components/logo';
@@ -39,12 +39,8 @@ export default function LoginView() {
     setLoading(true);
 
     try {
-      const response = await axios.post('http://localhost:8080/account/login', {
-        email,
-        password,
-      });
-
-      const { access_token, refresh_token } = response.data.content;
+      const response = await login(email, password);
+      const { access_token, refresh_token } = response.content;
 
       localStorage.setItem('access_token', access_token);
       localStorage.setItem('refresh_token', refresh_token);

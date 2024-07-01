@@ -23,8 +23,8 @@ const navConfig = [
     icon: icon('ic_dishes'),
   },
   // {
-  //   title: 'blog',
-  //   path: '/blog',
+  //   title: 'table',
+  //   path: '/table',
   //   icon: icon('ic_blog'),
   // },
   {
