@@ -22,11 +22,16 @@ const navConfig = [
     path: '/products',
     icon: icon('ic_dishes'),
   },
-  // {
-  //   title: 'table',
-  //   path: '/table',
-  //   icon: icon('ic_blog'),
-  // },
+  {
+    title: 'table',
+    path: '/order',
+    icon: icon('ic_blog'),
+  },
+  {
+    title: 'area',
+    path: '/area',
+    icon: icon('ic_blog'),
+  },
   {
     title: 'login',
     path: '/login',
