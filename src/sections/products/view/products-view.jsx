@@ -1,12 +1,16 @@
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 
 import Stack from '@mui/material/Stack';
 import Dialog from '@mui/material/Dialog';
+import Button from '@mui/material/Button';
 import Container from '@mui/material/Container';
 import Grid from '@mui/material/Unstable_Grid2';
 import Typography from '@mui/material/Typography';
 
-import { fetchProducts, fetchCategories } from 'src/api/products';
+import { fetchDishCategories } from 'src/api/category';
+import { createDish, fetchDishes, updateDish } from 'src/api/dishes';
+
+import Iconify from 'src/components/iconify';
 
 import ProductCard from '../product-card';
 import ProductSort from '../product-sort';
@@ -23,11 +27,12 @@ export default function ProductsView() {
   const [openFilter, setOpenFilter] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [openDialog, setOpenDialog] = useState(false);
+  const [isCreatingNewProduct, setIsCreatingNewProduct] = useState(false);
 
   useEffect(() => {
     const getCategories = async () => {
       try {
-        const categoryData = await fetchCategories();
+        const categoryData = await fetchDishCategories();
         setCategories(categoryData);
       } catch (error) {
         console.error('Failed to fetch categories:', error);
@@ -36,7 +41,7 @@ export default function ProductsView() {
 
     const getProducts = async () => {
       try {
-        const productData = await fetchProducts();
+        const productData = await fetchDishes();
         setProducts(productData);
       } catch (error) {
         console.error('Failed to fetch products:', error);
@@ -50,7 +55,8 @@ export default function ProductsView() {
   }, []);
 
   useEffect(() => {
-    const groupByCategory = (productList) => productList.reduce((acc, product) => {
+    const groupByCategory = (productList) =>
+      productList.reduce((acc, product) => {
         const category = product.dishCategoryId;
         if (!acc[category]) {
           acc[category] = [];
@@ -62,7 +68,9 @@ export default function ProductsView() {
     let filtered = products;
 
     if (selectedCategories.length > 0) {
-      filtered = filtered.filter((product) => selectedCategories.includes(product.dishCategoryId));
+      filtered = filtered.filter((product) =>
+        selectedCategories.includes(product.dishCategoryId)
+      );
     }
 
     if (isAvailableOnly) {
@@ -93,52 +101,59 @@ export default function ProductsView() {
     setIsAvailableOnly((prev) => !prev);
   };
 
-  if (loading) {
-    return <div>Loading...</div>;
-  }
+  const handleOpenDialog = (product = null, isNew = false) => {
+    setSelectedProduct(product || {});
+    setIsCreatingNewProduct(isNew);
+    setOpenDialog(true);
+  };
+
+  const handleCloseDialog = () => {
+    setSelectedProduct(null);
+    setOpenDialog(false);
+    setIsCreatingNewProduct(false);
+  };
+
 
   const handleUpdateProduct = async (updatedProduct) => {
     try {
-      // Call your API to update the product
-      // const result = await updateProduct(updatedProduct);
-      
-      // Update the products state with the new data
-      setProducts(prevProducts => 
-        prevProducts.map(p => 
-          p.dishId === updatedProduct.dishId ? updatedProduct : p
-        )
-      );
-      
-      setSelectedProduct(null);
-      setOpenDialog(false);
+        const updatedProductResponse = await updateDish(updatedProduct);
+        const updatedProductIndex = products.findIndex(p => p.dishId === updatedProduct.dishId);
+
+        if (updatedProductIndex !== -1) {
+            const updatedProducts = [...products];
+            updatedProducts[updatedProductIndex] = updatedProductResponse;
+            setProducts(updatedProducts);
+        }
+
+        handleCloseDialog();
     } catch (error) {
-      console.error('Failed to update product:', error);
+        console.error('Failed to update product:', error);
+    }
+};
+
+
+  const handleCreateProduct = async (newProductData) => {
+    try {
+      const createdProduct = await createDish(newProductData);
+      setProducts(prevProducts => [...prevProducts, createdProduct]);
+
+      handleCloseDialog();
+    } catch (error) {
+      console.error('Failed to create product:', error);
     }
   };
 
   const handleToggleAvailability = async (dishId, newAvailability) => {
     try {
-      // Call the API to update the product availability
-      // const updatedProduct = await updateProductAvailability(dishId, newAvailability);
-      
-      // Update the products state with the new data
-      // setProducts(prevProducts => 
-      //   prevProducts.map(p => 
-      //     p.dishId === dishId ? {...p, isAvailable: newAvailability} : p
-      //   )
-      // );
-
-      // Optionally, you can show a success message to the user
-      // For example, if you're using a snackbar or toast notification:
-      // showNotification('Product availability updated successfully');
+      // Implement logic to toggle product availability
     } catch (error) {
       console.error('Failed to update product availability:', error);
-      
-      // Optionally, show an error message to the user
-      // showNotification('Failed to update product availability', 'error');
     }
   };
 
+  if (loading) {
+    return <div>Loading...</div>;
+  }
 
   return (
     <Container>
@@ -165,11 +180,21 @@ export default function ProductsView() {
             onToggleAvailable={handleToggleAvailable}
           />
           <ProductSort />
+          <Button
+            variant="contained"
+            color="inherit"
+            startIcon={<Iconify icon="eva:plus-fill" />}
+            onClick={() => handleOpenDialog(null, true)}
+          >
+            New Product
+          </Button>
         </Stack>
       </Stack>
 
       {Object.keys(filteredProducts).map((categoryId) => {
-        const category = categories.find((cat) => cat.dishCateGoryId === categoryId);
+        const category = categories.find(
+          (cat) => cat.dishCateGoryId === categoryId
+        );
         return (
           <div key={categoryId}>
             <Typography variant="h5" sx={{ mt: 3, mb: 2 }}>
@@ -180,7 +205,7 @@ export default function ProductsView() {
                 <Grid key={product.dishId} xs={12} sm={6} md={3}>
                   <ProductCard
                     product={product}
-                    onEdit={handleUpdateProduct}
+                    onEdit={handleOpenDialog}
                     onToggleAvailability={handleToggleAvailability}
                   />
                 </Grid>
@@ -192,15 +217,18 @@ export default function ProductsView() {
 
       <Dialog
         open={openDialog}
-        onClose={() => setOpenDialog(false)}
+        onClose={handleCloseDialog}
         aria-labelledby="product-detail-dialog"
-        maxWidth="lg"
+        maxWidth="md"
         fullWidth
       >
         {selectedProduct && (
           <ProductDetail
-            product={selectedProduct}
-            onUpdate={handleUpdateProduct}
+            product={isCreatingNewProduct ? {} : selectedProduct}
+            isUpdate={!isCreatingNewProduct}
+            onUpdate={isCreatingNewProduct ? handleCreateProduct : handleUpdateProduct}
+            open={openDialog}
+            onClose={handleCloseDialog}
           />
         )}
       </Dialog>
