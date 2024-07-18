@@ -132,16 +132,27 @@ export default function ProductsView() {
 };
 
 
-  const handleCreateProduct = async (newProductData) => {
-    try {
-      const createdProduct = await createDish(newProductData);
-      setProducts(prevProducts => [...prevProducts, createdProduct]);
+const handleCreateProduct = async (newProductData) => {
+  const newProductJson = Object.fromEntries(
+    [...newProductData].map((entry) => {
+      if (entry[0] === 'dishPrice') {
+        return [entry[0], Number(entry[1])];
+      }
+      return entry;
+    })
+  );
 
-      handleCloseDialog();
-    } catch (error) {
-      console.error('Failed to create product:', error);
-    }
-  };
+  try {
+    const createdProduct = await createDish(newProductJson);
+    setProducts((prevProducts) => [...prevProducts, createdProduct]);
+
+    handleCloseDialog();
+  } catch (error) {
+    console.error('Failed to create product:', error);
+  }
+};
+
+
 
   const handleToggleAvailability = async (dishId, newAvailability) => {
     try {

@@ -12,7 +12,7 @@ export const fetchDishes = async () => {
 
 export const updateDish = async (dishData) => {
   try {
-      const response = await axiosInstance.put(`/dish`, dishData);
+      const response = await axiosInstance.post(`/dish`, dishData);
       return response.data;
   } catch (error) {
       console.error("Error updating dish:", error);
@@ -22,7 +22,7 @@ export const updateDish = async (dishData) => {
 
 export const createDish = async (dishData) => {
   try {
-      const response = await axiosInstance.post('/dish', dishData);
+      const response = await axiosInstance.post(`/dish`, dishData);
       return response.data;
   } catch (error) {
       console.error("Error creating dish:", error);
