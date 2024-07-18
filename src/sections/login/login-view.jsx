@@ -67,7 +67,7 @@ export default function LoginView() {
 
   const renderForm = (
     <form onSubmit={handleSubmit}>
-      <Stack spacing={3}>
+      <Stack spacing={3} my = {3}>
         <TextField 
           name="email" 
           label="Email address" 
@@ -94,12 +94,6 @@ export default function LoginView() {
         />
       </Stack>
 
-      <Stack direction="row" alignItems="center" justifyContent="flex-end" sx={{ my: 3 }}>
-        <Link variant="subtitle2" underline="hover">
-          Forgot password?
-        </Link>
-      </Stack>
-
       <LoadingButton
         fullWidth
         size="large"
@@ -114,6 +108,7 @@ export default function LoginView() {
   );
 
   return (
+    
     <Box
       sx={{
         ...bgGradient({
@@ -141,50 +136,7 @@ export default function LoginView() {
         >
           <Typography variant="h4">Sign in to Riverside Admin</Typography>
 
-          <Typography variant="body2" sx={{ mt: 2, mb: 5 }}>
-            Don’t have an account?
-            <Link variant="subtitle2" sx={{ ml: 0.5 }}>
-              Get started
-            </Link>
-          </Typography>
-
-          <Stack direction="row" spacing={2}>
-            <Button
-              fullWidth
-              size="large"
-              color="inherit"
-              variant="outlined"
-              sx={{ borderColor: alpha(theme.palette.grey[500], 0.16) }}
-            >
-              <Iconify icon="eva:google-fill" color="#DF3E30" />
-            </Button>
-
-            <Button
-              fullWidth
-              size="large"
-              color="inherit"
-              variant="outlined"
-              sx={{ borderColor: alpha(theme.palette.grey[500], 0.16) }}
-            >
-              <Iconify icon="eva:facebook-fill" color="#1877F2" />
-            </Button>
-
-            <Button
-              fullWidth
-              size="large"
-              color="inherit"
-              variant="outlined"
-              sx={{ borderColor: alpha(theme.palette.grey[500], 0.16) }}
-            >
-              <Iconify icon="eva:twitter-fill" color="#1C9CEA" />
-            </Button>
-          </Stack>
-
-          <Divider sx={{ my: 3 }}>
-            <Typography variant="body2" sx={{ color: 'text.secondary' }}>
-              OR
-            </Typography>
-          </Divider>
+          <Divider sx={{ m: 3 }} />
 
           {renderForm}
         </Card>

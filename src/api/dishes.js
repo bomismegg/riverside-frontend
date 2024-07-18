@@ -20,9 +20,10 @@ export const updateDish = async (dishData) => {
   }
 };
 
-export const createDish = async (dishData) => {
+export const createDish = async (request) => {
   try {
-      const response = await axiosInstance.post(`/dish`, dishData);
+      
+      const response = await axiosInstance.post(`/dish`, request);
       return response.data;
   } catch (error) {
       console.error("Error creating dish:", error);
