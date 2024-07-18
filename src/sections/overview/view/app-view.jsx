@@ -10,8 +10,8 @@ import { fetchDishCategories } from 'src/api/category';
 import { fetchDishesByCategoryId } from 'src/api/dishes';
 
 import AppCurrentVisits from '../app-current-visits';
-import AppRevenueReport from '../app-revenue-report';
 import AppWidgetSummary from '../app-widget-summary';
+import AppRevenueReport from '../app-revenue-report';
 
 // ----------------------------------------------------------------------
 
@@ -108,23 +108,7 @@ export default function AppView() {
         </Grid>
 
         <Grid xs={12} md={6} lg={8}>
-          <AppRevenueReport
-            title="Revenue Report by Month"
-            subheader="Total revenue per month"
-            chart={{
-              labels: [
-                'January', 'February', 'March', 'April', 'May', 'June',
-                'July', 'August', 'September', 'October', 'November', 'December'
-              ],
-              series: [
-                {
-                  name: 'Revenue',
-                  type: 'column',
-                  data: monthlyRevenue,
-                },
-              ],
-            }}
-          />
+          <AppRevenueReport data={monthlyRevenue} title="Monthly Revenue Report"/>
         </Grid>
 
         <Grid xs={12} md={6} lg={4}>
