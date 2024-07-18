@@ -1,4 +1,3 @@
-/* eslint-disable no-shadow */
 import { useState } from 'react';
 import PropTypes from 'prop-types';
 
@@ -19,7 +18,7 @@ import CategoryTableHead from './category-table-head';
 import CategoryTableToolbar from './category-table-toolbar';
 import { emptyRows, applyFilter, getComparator } from './utils';
 
-export default function CategoryTableView({ categories }) {
+export default function CategoryTableView({ categories, onUpdateCategory, onDeleteCategory }) {
     const [loading] = useState(false);
     const [page, setPage] = useState(0);
     const [order, setOrder] = useState('asc');
@@ -103,41 +102,42 @@ export default function CategoryTableView({ categories }) {
                         <CategoryTableHead
                             order={order}
                             orderBy={orderBy}
+                            headLabel={[
+                                { id: 'dishCateGoryId', label: 'ID', alignRight: false },
+                                { id: 'name', label: 'Name', alignRight: false },
+                                { id: 'description', label: 'Description', alignRight: false },
+                                { id: '' },
+                            ]}
                             rowCount={categories.length}
                             numSelected={selectedCategories.length}
-                            onRequestSort={handleSort}
                             onSelectAllClick={handleSelectAllClick}
-                            headLabel={[
-                                { id: 'dishCateGoryId', label: 'Dish Category ID' },
-                                { id: 'name', label: 'Name' },
-                                { id: 'description', label: 'Description' },
-                                { id: 'createdDate', label: 'Created At' },
-                                { id: 'createdBy', label: 'Created By' },
-                                { id: 'updatedDate', label: 'Updated At' },
-                                { id: 'updatedBy', label: 'Updated By' }
-                            ]}
+                            onRequestSort={handleSort}
                         />
+
                         <TableBody>
-                            {loading ? (
+                            {loading && (
                                 <TableRow>
-                                    <TableCell colSpan={7} align="center">
+                                    <TableCell align="center" colSpan={6}>
                                         <CircularProgress />
                                     </TableCell>
                                 </TableRow>
-                            ) : (
-                                dataFiltered
-                                    .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-                                    .map((category) => (
-                                        <CategoryTableRow
-                                            key={category.dishCateGoryId}
-                                            category={category}
-                                            selected={isSelected(category.dishCateGoryId)}
-                                            handleClick={() => handleSelect(category.dishCateGoryId)}
-                                        />
-                                    ))
                             )}
-                            <TableEmptyRows height={53} emptyRows={emptyRows(page, rowsPerPage, categories.length)} />
-                            {notFound ? <TableNoData query={filterName} /> : null}
+
+                            {dataFiltered
+                                .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+                                .map((category) => (
+                                    <CategoryTableRow
+                                        key={category.dishCateGoryId}
+                                        category={category}
+                                        selected={isSelected(category.dishCateGoryId)}
+                                        handleClick={() => handleSelect(category.dishCateGoryId)}
+                                        onUpdateCategory={onUpdateCategory}
+                                        onDeleteCategory={onDeleteCategory}
+                                    />
+                                ))}
+
+                            <TableEmptyRows height={72} emptyRows={emptyRows(page, rowsPerPage, categories.length)} />
+                            {notFound && <TableNoData query={filterName} />}
                         </TableBody>
                     </Table>
                 </TableContainer>
@@ -158,5 +158,6 @@ export default function CategoryTableView({ categories }) {
 
 CategoryTableView.propTypes = {
     categories: PropTypes.array.isRequired,
+    onUpdateCategory: PropTypes.func.isRequired,
+    onDeleteCategory: PropTypes.func.isRequired,
 };
-

@@ -12,9 +12,9 @@ import IconButton from '@mui/material/IconButton';
 
 import Iconify from 'src/components/iconify';
 
-export default function CategoryTableRow({ category, selected, handleClick, onShowDetails }) {
+export default function CategoryTableRow({ category, selected, handleClick, onShowDetails, onDeleteCategory }) {
     const [open, setOpen] = useState(null);
-    const { categoryId, name, description } = category;
+    const { dishCateGoryId, name, description } = category;
 
     const handleOpenMenu = (event) => {
         setOpen(event.currentTarget);
@@ -22,6 +22,11 @@ export default function CategoryTableRow({ category, selected, handleClick, onSh
 
     const handleCloseMenu = () => {
         setOpen(null);
+    };
+
+    const handleDeleteCategory = () => {
+        onDeleteCategory(dishCateGoryId);
+        handleCloseMenu();
     };
 
     return (
@@ -62,12 +67,12 @@ export default function CategoryTableRow({ category, selected, handleClick, onSh
                     sx: { width: 140 },
                 }}
             >
-                <MenuItem onClick={() => { handleCloseMenu(); onShowDetails(categoryId); }}>
+                <MenuItem onClick={() => { handleCloseMenu(); onShowDetails(dishCateGoryId); }}>
                     <Iconify icon="eva:edit-fill" sx={{ mr: 2 }} />
                     Edit
                 </MenuItem>
 
-                <MenuItem onClick={handleCloseMenu} sx={{ color: 'error.main' }}>
+                <MenuItem onClick={handleDeleteCategory} sx={{ color: 'error.main' }}>
                     <Iconify icon="eva:trash-2-outline" sx={{ mr: 2 }} />
                     Delete
                 </MenuItem>
@@ -81,5 +86,5 @@ CategoryTableRow.propTypes = {
     selected: PropTypes.bool.isRequired,
     handleClick: PropTypes.func.isRequired,
     onShowDetails: PropTypes.func.isRequired,
+    onDeleteCategory: PropTypes.func.isRequired,
 };
-

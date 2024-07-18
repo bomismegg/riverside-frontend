@@ -10,9 +10,9 @@ export const fetchDishCategories = async () => {
     }
 };
 
-export const updateDishCategory = async (categoryId, categoryData) => {
+export const updateDishCategory = async (categoryData) => {
     try {
-        const response = await axiosInstance.put(`/dishCategory/${categoryId}`, categoryData);
+        const response = await axiosInstance.put(`/dishCategory`, categoryData);
         return response.data;
     } catch (error) {
         console.error("Error updating dish category:", error);

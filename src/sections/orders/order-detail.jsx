@@ -24,7 +24,7 @@ export default function OrderDetail({ order, onAddDish, onRemoveDish, onComplete
     const [availableDishes, setAvailableDishes] = useState([]);
     const [isDishDialogOpen, setIsDishDialogOpen] = useState(false);
     const [localOrderDetails, setLocalOrderDetails] = useState(order.orderDetails);
-
+    console.log(order)
     useEffect(() => {
         const getDishes = async () => {
             try {
@@ -187,28 +187,20 @@ export default function OrderDetail({ order, onAddDish, onRemoveDish, onComplete
             </DialogContent>
             <DialogActions>
                 <Button
-                    onClick={handleSaveChanges}
-                    variant="contained"
-                    color="primary"
-                    disabled={isCompleted || order.status === 'CANCELLED'}
-                >
-                    Save
-                </Button>
-                <Button
-                    onClick={handleStatusChange}
-                    variant="contained"
-                    color="primary"
-                    disabled={isCompleted || order.status === 'CANCELLED'}
-                >
-                    {getStatusButtonText(order.status)}
-                </Button>
-                <Button
                     onClick={handleCancelOrder}
                     variant="contained"
                     color="error"
                     disabled={isCompleted || order.status === 'CANCELLED'}
                 >
                     Cancel Order
+                </Button>
+                <Button
+                    onClick={handleSaveChanges}
+                    variant="contained"
+                    color="primary"
+                    disabled={isCompleted || order.status === 'CANCELLED'}
+                >
+                    Save
                 </Button>
                 <Button onClick={onClose} variant="contained" color='primary'>
                     Close

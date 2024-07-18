@@ -12,7 +12,7 @@ export const fetchOrders = async () => {
 
 export const updateOrder = async (orderData) => {
     try {
-        const response = await axiosInstance.put(`/order`, orderData);
+        const response = await axiosInstance.post(`/order`, orderData);
         return response.data;
     } catch (error) {
         console.error("Error updating order:", error);
