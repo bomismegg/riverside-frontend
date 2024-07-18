@@ -122,8 +122,8 @@ export default function ProductCard({ product, onEdit, onToggleAvailability }) {
           Edit
         </MenuItem>
         <MenuItem onClick={handleToggleAvailability}>
-          <Iconify icon="eva:toggle-fill" sx={{ mr: 2, width: 20, height: 20 }} />
-          {product.isAvailable ? 'Mark Unavailable' : 'Mark Available'}
+          <Iconify icon="eva:trash-2-fill" sx={{ mr: 2, width: 20, height: 20 }} />
+          {product.isAvailable ? 'Unavailable' : 'Available'}
         </MenuItem>
       </Menu>
     </Card>

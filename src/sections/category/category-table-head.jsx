@@ -10,7 +10,6 @@ import TableSortLabel from '@mui/material/TableSortLabel';
 import { visuallyHidden } from './utils';
 
 const categoryHeadLabel = [
-  { id: 'dishCateGoryId', label: 'Category ID', width: '100px', minWidth: '100px' },
   { id: 'name', label: 'Category Name', width: '100px', minWidth: '100px' },
   { id: 'description', label: 'Description', width: '170px', minWidth: '170px' },
   { id: 'createdDate', width: '50px', minWidth: '50px' },

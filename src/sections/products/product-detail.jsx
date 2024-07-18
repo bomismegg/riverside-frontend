@@ -20,7 +20,7 @@ import { createDishCategory, fetchDishCategories } from 'src/api/category';
 
 import Iconify from 'src/components/iconify';
 
-export default function ProductDetail({ product, isUpdate, onUpdate, open, onClose }) {
+export default function DishDetail({ product, isUpdate, onUpdate, open, onClose }) {
     const [formData, setFormData] = useState({
         dishId: product.dishId,
         name: product.name,
@@ -132,7 +132,7 @@ export default function ProductDetail({ product, isUpdate, onUpdate, open, onClo
                 <DialogContent>
                     <Box component="form" onSubmit={handleSubmit} sx={{ padding: 2 }}>
                         <Typography variant="h4" gutterBottom>
-                            Product Details
+                            Dish Details
                         </Typography>
                         <Grid container spacing={4}>
                             <Grid item xs={12} md={6}>
@@ -221,7 +221,7 @@ export default function ProductDetail({ product, isUpdate, onUpdate, open, onClo
                                     </Grid>
                                     <Grid item xs={12}>
                                         <Button type="submit" variant="contained" fullWidth>
-                                            {isUpdate ? 'Update Product' : 'Create New Product'}
+                                            {isUpdate ? 'Update Dish' : 'Create New Dish'}
                                         </Button>
                                     </Grid>
                                 </Grid>
@@ -271,7 +271,7 @@ export default function ProductDetail({ product, isUpdate, onUpdate, open, onClo
     );
 }
 
-ProductDetail.propTypes = {
+DishDetail.propTypes = {
     product: PropTypes.object.isRequired,
     onUpdate: PropTypes.func.isRequired,
     isUpdate: PropTypes.bool.isRequired,

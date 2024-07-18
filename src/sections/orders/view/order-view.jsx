@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { toast, ToastContainer } from 'react-toastify';
 
 import Stack from '@mui/material/Stack';
 import Dialog from '@mui/material/Dialog';
@@ -10,7 +11,7 @@ import Typography from '@mui/material/Typography';
 import { fetchAreaById } from 'src/api/area';
 import { fetchTableById } from 'src/api/table';
 import { fetchOrders, updateOrder } from 'src/api/order';
-import { fetchOrderDetailsByOrderId } from 'src/api/order-details';
+import { createOrderDetail, deleteOrderDetail, fetchOrderDetailsByOrderId } from 'src/api/order-details';
 
 import OrderCard from '../order-card';
 import OrderDetail from '../order-detail';
@@ -53,32 +54,60 @@ export default function OrdersView() {
     };
 
     const handleAddDish = async (orderId, dishId, quantity) => {
-        const updatedOrders = orders.map(order => {
-            if (order.orderId === orderId) {
-                const existingDetail = order.orderDetails.find(detail => detail.dishId === dishId);
-                if (existingDetail) {
-                    existingDetail.quantity += quantity;
-                } else {
-                    order.orderDetails.push({ dishId, quantity, price: 0, description: '', dishName: '', personSaveId: order.createBy});
+        try {
+            const newOrderDetail = await createOrderDetail({
+                orderId,
+                dishId,
+                quantity,
+                price: 0, // Adjust this if you have the price data available
+                description: '',
+                status: 'HAVE_NOT_STARTED',
+                personSaveId: localStorage.userId,
+            });
+            const updatedOrders = orders.map(order => {
+                if (order.orderId === orderId) {
+                    const existingDetail = order.orderDetails.find(detail => detail.dishId === dishId);
+                    if (existingDetail) {
+                        existingDetail.quantity += quantity;
+                    } else {
+                        order.orderDetails.push(newOrderDetail.content);
+                    }
+                    order.totalPrice += quantity * 0; // Adjust this if you have the price data available
                 }
-                order.totalPrice += quantity * 0; 
-            }
-            return order;
-        });
-        setOrders(updatedOrders);
-        await updateOrder({ orderId, orderDetails: updatedOrders.find(order => order.orderId === orderId).orderDetails });
+                return order;
+            });
+            setOrders(updatedOrders);
+            toast.success('Dish added successfully!', {
+                position: 'top-right',
+            });
+        } catch (error) {
+            console.error('Failed to add dish:', error);
+            toast.error('Failed to add dish.', {
+                position: 'top-right',
+            });
+        }
     };
 
     const handleRemoveDish = async (orderId, dishId) => {
-        const updatedOrders = orders.map(order => {
-            if (order.orderId === orderId) {
-                order.orderDetails = order.orderDetails.filter(detail => detail.dishId !== dishId);
-                order.totalPrice = order.orderDetails.reduce((total, detail) => total + detail.quantity * detail.price, 0);
-            }
-            return order;
-        });
-        setOrders(updatedOrders);
-        await updateOrder({ orderId, orderDetails: updatedOrders.find(order => order.orderId === orderId).orderDetails });
+        try {
+            await deleteOrderDetail(orderId, dishId);
+            const updatedOrders = orders.map(order => {
+                if (order.orderId === orderId) {
+                    order.orderDetails = order.orderDetails.filter(detail => detail.dishId !== dishId);
+                    order.totalPrice = order.orderDetails.reduce((total, detail) => total + detail.quantity * detail.price, 0);
+                }
+                return order;
+            });
+            setOrders(updatedOrders);
+            toast.success('Dish removed successfully!', {
+                position: 'top-right',
+            });
+        } catch (error) {
+            console.error('Failed to remove dish:', error);
+            toast.error('Failed to remove dish.', {
+                position: 'top-right',
+            });
+        }
     };
 
     const handleCompleteOrder = async (orderId) => {
@@ -106,7 +135,7 @@ export default function OrdersView() {
     const handleSaveChanges = async (updatedOrder) => {
         try {
             await updateOrder(updatedOrder);
-            const updatedOrders = orders.map(order => 
+            const updatedOrders = orders.map(order =>
                 order.orderId === updatedOrder.orderId ? updatedOrder : order
             );
             setOrders(updatedOrders);
@@ -127,7 +156,7 @@ export default function OrdersView() {
                     {viewMode === 'card' ? 'Active Orders' : 'Orders History'}
                 </Typography>
                 <Button variant="outlined" onClick={() => setViewMode(viewMode === 'card' ? 'table' : 'card')}>
-                    {viewMode === 'card' ? 'Switch to Table View' : 'Switch to Card View'}
+                    {viewMode === 'card' ? 'History' : 'Active Orders'}
                 </Button>
             </Stack>
 
@@ -169,6 +198,7 @@ export default function OrdersView() {
                     />
                 )}
             </Dialog>
+            <ToastContainer />
         </Container>
     );
 }

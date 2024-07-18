@@ -49,7 +49,7 @@ export function applyFilter({ inputData, comparator, filterName }) {
 
     if (filterName) {
         inputData = inputData.filter(
-            (order) => order.orderId.toLowerCase().indexOf(filterName.toLowerCase()) !== -1
+            (order) => order.name.toLowerCase().indexOf(filterName.toLowerCase()) !== -1
         );
     }
 

@@ -1,132 +1,106 @@
+import React from 'react';
 import PropTypes from 'prop-types';
-import { toast } from 'react-toastify';
-import React, { useState } from 'react';
-import 'react-toastify/dist/ReactToastify.css';
 
+import Box from '@mui/material/Box';
+import { MenuItem } from '@mui/material';
+import Dialog from '@mui/material/Dialog';
+import Button from '@mui/material/Button';
+import TextField from '@mui/material/TextField';
+import Typography from '@mui/material/Typography';
+import DialogContent from '@mui/material/DialogContent';
+import DialogActions from '@mui/material/DialogActions';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
-import {
-    Dialog,
-    Button,
-    MenuItem,
-    TextField,
-    DialogTitle,
-    DialogContent,
-    DialogActions,
-} from '@mui/material';
 
-import { registerUser } from 'src/api/user';
-
-export default function UserDetails({ open, onClose, onSave }) {
-    const [form, setForm] = useState({
-        displayName: '',
-        email: '',
-        password: '123', // Default password
-        birthday: null,
-        phoneNumber: '',
-        address: '',
-        role: 'STAFF',
-    });
-
-    const handleChange = (event) => {
-        const { name, value } = event.target;
-        setForm({
-            ...form,
-            [name]: value,
-        });
-    };
-
-    const handleDateChange = (date) => {
-        setForm({
-            ...form,
-            birthday: date,
-        });
-    };
-
-    const handleSubmit = async () => {
-        try {
-            const response = await registerUser(form);
-            if (response.content?.responseMessage) {
-                toast.info(response.content.responseMessage);
-                toast.info("Default password is 123");
-                onSave();
-                onClose();
-            } else {
-                toast.error('Unexpected error occurred');
-            }
-        } catch (error) {
-            console.error('Failed to create user:', error);
-            toast.error('Failed to create user');
-        }
-    };
-
+export default function UserDetailsDialog({
+    open,
+    onClose,
+    formData,
+    onChange,
+    onSubmit,
+    dialogTitle,
+    submitButtonLabel
+}) {
     return (
-        <Dialog open={open} onClose={onClose}>
-            <DialogTitle>Create New User</DialogTitle>
+        <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
             <DialogContent>
-                <TextField
-                    label="Display Name"
-                    name="displayName"
-                    value={form.displayName}
-                    onChange={handleChange}
-                    fullWidth
-                    margin="normal"
-                />
-                <TextField
-                    label="Email"
-                    name="email"
-                    value={form.email}
-                    onChange={handleChange}
-                    fullWidth
-                    margin="normal"
-                />
-                <DatePicker
-                    label="Birthday"
-                    value={form.birthday}
-                    onChange={handleDateChange}
-                    renderInput={(params) => <TextField {...params} fullWidth margin="normal" />}
-                    sx={{ width: '100%' }} // Make the DatePicker full width
-                />
-                <TextField
-                    label="Phone Number"
-                    name="phoneNumber"
-                    value={form.phoneNumber}
-                    onChange={handleChange}
-                    fullWidth
-                    margin="normal"
-                />
-                <TextField
-                    label="Address"
-                    name="address"
-                    value={form.address}
-                    onChange={handleChange}
-                    fullWidth
-                    margin="normal"
-                />
-                <TextField
-                    label="Role"
-                    name="role"
-                    select
-                    value={form.role}
-                    onChange={handleChange}
-                    fullWidth
-                    margin="normal"
-                >
-                    <MenuItem value="STAFF">Staff</MenuItem>
-                    <MenuItem value="ADMIN">Admin</MenuItem>
-                </TextField>
+                <Box sx={{ padding: 2 }}>
+                    <Typography variant="h6" gutterBottom>
+                        {dialogTitle}
+                    </Typography>
+                    <TextField
+                        name="displayName"
+                        label="Display Name"
+                        value={formData.fullName}
+                        onChange={onChange}
+                        fullWidth
+                        required
+                        autoFocus
+                    />
+                    <TextField
+                        name="email"
+                        label="Email"
+                        value={formData.email}
+                        onChange={onChange}
+                        fullWidth
+                        required
+                        sx={{ mt: 1 }}
+                    />
+                    <DatePicker
+                        label="Birthday"
+                        value={formData.birthday ? new Date(formData.birthday) : null}
+                        onChange={(date) => onChange({ target: { name: 'birthday', value: date } })}
+                        renderInput={(params) => <TextField {...params} fullWidth margin="normal" />}
+                        sx={{ mt: 1, width: '100%' }}
+                    />
+                    <TextField
+                        name="phoneNumber"
+                        label="Phone Number"
+                        value={formData.phoneNumber}
+                        onChange={onChange}
+                        fullWidth
+                        sx={{ mt: 1 }}
+                    />
+                    <TextField
+                        name="address"
+                        label="Address"
+                        value={formData.address}
+                        onChange={onChange}
+                        fullWidth
+                        sx={{ mt: 1 }}
+                    />
+                    <TextField
+                        name="role"
+                        label="Role"
+                        value={formData.role}
+                        onChange={onChange}
+                        select
+                        fullWidth
+                        sx={{ mt: 1 }}
+                    >
+                        <MenuItem value="STAFF">Staff</MenuItem>
+                        <MenuItem value="MANAGER">Manager</MenuItem>
+                    </TextField>
+                </Box>
             </DialogContent>
             <DialogActions>
-                <Button onClick={onClose}>Cancel</Button>
-                <Button onClick={handleSubmit} variant="contained">
-                    Save
+                <Button onClick={onClose} color="secondary">
+                    Cancel
+                </Button>
+                <Button onClick={onSubmit} color="primary">
+                    {submitButtonLabel}
                 </Button>
             </DialogActions>
         </Dialog>
     );
 }
 
-UserDetails.propTypes = {
-    open: PropTypes.bool,
-    onClose: PropTypes.func,
-    onSave: PropTypes.func,
+UserDetailsDialog.propTypes = {
+    open: PropTypes.bool.isRequired,
+    onClose: PropTypes.func.isRequired,
+    formData: PropTypes.object.isRequired,
+    onChange: PropTypes.func.isRequired,
+    onSubmit: PropTypes.func.isRequired,
+    dialogTitle: PropTypes.string.isRequired,
+    submitButtonLabel: PropTypes.string.isRequired,
 };
+

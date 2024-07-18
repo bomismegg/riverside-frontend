@@ -15,7 +15,6 @@ import { createDish, updateDish, fetchDishes } from 'src/api/dishes';
 import Iconify from 'src/components/iconify';
 
 import ProductCard from '../product-card';
-import ProductSort from '../product-sort';
 import ProductDetail from '../product-detail';
 import ProductFilters from '../product-filters';
 
@@ -187,7 +186,7 @@ export default function ProductsView() {
   return (
     <Container>
       <Typography variant="h4" sx={{ mb: 5 }}>
-        Products
+        Dishes
       </Typography>
 
       <Stack
@@ -208,14 +207,13 @@ export default function ProductsView() {
             isAvailableOnly={isAvailableOnly}
             onToggleAvailable={handleToggleAvailable}
           />
-          <ProductSort />
           <Button
             variant="contained"
             color="inherit"
             startIcon={<Iconify icon="eva:plus-fill" />}
             onClick={() => handleOpenDialog(null, true)}
           >
-            New Product
+            New Dish
           </Button>
         </Stack>
       </Stack>

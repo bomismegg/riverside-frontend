@@ -2,7 +2,6 @@ import { useState } from 'react';
 import PropTypes from 'prop-types';
 
 import Stack from '@mui/material/Stack';
-import Avatar from '@mui/material/Avatar';
 import Popover from '@mui/material/Popover';
 import TableRow from '@mui/material/TableRow';
 import Checkbox from '@mui/material/Checkbox';
@@ -14,96 +13,93 @@ import IconButton from '@mui/material/IconButton';
 import Label from 'src/components/label';
 import Iconify from 'src/components/iconify';
 
-// ----------------------------------------------------------------------
+export default function UserTableRow({ user, selected, handleClick, onUpdateUser, onDeleteUser }) {
+    const [open, setOpen] = useState(null);
+    const { userId, fullName, email, phoneNumber, address, role, isEnable, isUnlocked } = user;
+    const handleOpenMenu = (event) => {
+        setOpen(event.currentTarget);
+    };
 
-export default function UserTableRow({
-  selected,
-  name,
-  email,
-  avatarUrl,
-  address,
-  role,
-  isVerified,
-  status,
-  handleClick,
-}) {
-  const [open, setOpen] = useState(null);
+    const handleCloseMenu = () => {
+        setOpen(null);
+    };
 
-  const handleOpenMenu = (event) => {
-    setOpen(event.currentTarget);
-  };
+    const handleDeleteUser = () => {
+        onDeleteUser(userId);
+        handleCloseMenu();
+    };
 
-  const handleCloseMenu = () => {
-    setOpen(null);
-  };
+    return (
+        <>
+            <TableRow hover tabIndex={-1} role="checkbox" selected={selected}>
+                <TableCell padding="checkbox">
+                    <Checkbox
+                        disableRipple
+                        checked={selected}
+                        onChange={handleClick}
+                    />
+                </TableCell>
 
-  return (
-    <>
-      <TableRow hover tabIndex={-1} role="checkbox" selected={selected}>
-        <TableCell padding="checkbox">
-          <Checkbox disableRipple checked={selected} onChange={handleClick} />
-        </TableCell>
+                <TableCell component="th" scope="row" padding="none">
+                    <Stack direction="row" alignItems="center" spacing={2}>
+                        <Typography variant="subtitle2" noWrap>
+                            {fullName}
+                        </Typography>
+                    </Stack>
+                </TableCell>
 
-        <TableCell component="th" scope="row" padding="none">
-          <Stack direction="row" alignItems="center" spacing={2}>
-            <Avatar alt={name} src={avatarUrl} />
-            <Typography variant="subtitle2" noWrap>
-              {name}
-            </Typography>
-          </Stack>
-        </TableCell>
+                <TableCell>{email}</TableCell>
 
-        <TableCell>{email}</TableCell>
+                <TableCell>{phoneNumber}</TableCell>
 
-        <TableCell>{address}</TableCell>
+                <TableCell>{address}</TableCell>
 
-        <TableCell>{role}</TableCell>
+                <TableCell>{role}</TableCell>
 
-        <TableCell align="center">{isVerified ? 'Yes' : 'No'}</TableCell>
+                <TableCell>
+                    <Label color={isEnable ? 'success' : 'error'}>{isEnable ? 'Enabled' : 'Disabled'}</Label>
+                </TableCell>
 
-        <TableCell>
-          <Label color={(status === 'Disabled' && 'error') || 'success'}>{status}</Label>
-        </TableCell>
+                <TableCell>
+                    <Label color={isUnlocked ? 'success' : 'error'}>{isUnlocked ? 'Verified' : 'Unverified'}</Label>
+                </TableCell>
 
-        <TableCell align="right">
-          <IconButton onClick={handleOpenMenu}>
-            <Iconify icon="eva:more-vertical-fill" />
-          </IconButton>
-        </TableCell>
-      </TableRow>
+                <TableCell align="right">
+                    <IconButton onClick={handleOpenMenu}>
+                        <Iconify icon="eva:more-vertical-fill" />
+                    </IconButton>
+                </TableCell>
+            </TableRow>
 
-      <Popover
-        open={!!open}
-        anchorEl={open}
-        onClose={handleCloseMenu}
-        anchorOrigin={{ vertical: 'top', horizontal: 'left' }}
-        transformOrigin={{ vertical: 'top', horizontal: 'right' }}
-        PaperProps={{
-          sx: { width: 140 },
-        }}
-      >
-        <MenuItem onClick={handleCloseMenu}>
-          <Iconify icon="eva:edit-fill" sx={{ mr: 2 }} />
-          Active/Deactive
-        </MenuItem>
+            <Popover
+                open={!!open}
+                anchorEl={open}
+                onClose={handleCloseMenu}
+                anchorOrigin={{ vertical: 'top', horizontal: 'left' }}
+                transformOrigin={{ vertical: 'top', horizontal: 'right' }}
+                PaperProps={{
+                    sx: { width: 140 },
+                }}
+            >
+                <MenuItem onClick={() => { handleCloseMenu(); onUpdateUser(user); }}>
+                    <Iconify icon="eva:edit-fill" sx={{ mr: 2 }} />
+                    Edit
+                </MenuItem>
 
-        <MenuItem onClick={handleCloseMenu} sx={{ color: 'error.main' }}>
-          <Iconify icon="eva:trash-2-outline" sx={{ mr: 2 }} />
-          Delete
-        </MenuItem>
-      </Popover>
-    </>
-  );
+                <MenuItem onClick={handleDeleteUser} sx={{ color: 'error.main' }}>
+                    <Iconify icon="eva:trash-2-outline" sx={{ mr: 2 }} />
+                    Delete
+                </MenuItem>
+            </Popover>
+        </>
+    );
 }
 
 UserTableRow.propTypes = {
-  avatarUrl: PropTypes.any,
-  address: PropTypes.any,
-  email: PropTypes.any,
-  handleClick: PropTypes.func,
-  isVerified: PropTypes.any,
-  name: PropTypes.any,
-  role: PropTypes.any,
-  selected: PropTypes.any,
-  status: PropTypes.string,
+    user: PropTypes.object.isRequired,
+    selected: PropTypes.bool.isRequired,
+    handleClick: PropTypes.func.isRequired,
+    onUpdateUser: PropTypes.func.isRequired,
+    onDeleteUser: PropTypes.func.isRequired,
 };
+

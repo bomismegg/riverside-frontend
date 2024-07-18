@@ -24,7 +24,7 @@ export default function OrderDetail({ order, onAddDish, onRemoveDish, onComplete
     const [availableDishes, setAvailableDishes] = useState([]);
     const [isDishDialogOpen, setIsDishDialogOpen] = useState(false);
     const [localOrderDetails, setLocalOrderDetails] = useState(order.orderDetails);
-
+    console.log(order)
     useEffect(() => {
         const getDishes = async () => {
             try {
@@ -100,31 +100,7 @@ export default function OrderDetail({ order, onAddDish, onRemoveDish, onComplete
     const calculateTotalPrice = () => localOrderDetails.reduce((total, detail) => total + detail.price * detail.quantity, 0);
 
     const isCompleted = order.status === 'DONE';
-
-    const getStatusButtonText = (status) => {
-        switch (status) {
-            case 'HAVE_NOT_STARTED':
-                return 'Serve All Dishes';
-            case 'IN_PROCESS':
-                return 'Complete Order';
-            case 'DONE':
-                return 'Completed';
-            case 'CANCELLED':
-                return 'Cancelled';
-            default:
-                return '';
-        }
-    };
-
-    const handleStatusChange = () => {
-        if (order.status === 'HAVE_NOT_STARTED') {
-            onCompleteOrder(order.orderId);
-        } else if (order.status === 'IN_PROCESS') {
-            onCompleteOrder(order.orderId);
-        }
-        onClose();
-    };
-
+    
     const handleCancelOrder = () => {
         onCancelOrder(order.orderId);
         onClose();
@@ -187,28 +163,20 @@ export default function OrderDetail({ order, onAddDish, onRemoveDish, onComplete
             </DialogContent>
             <DialogActions>
                 <Button
-                    onClick={handleSaveChanges}
-                    variant="contained"
-                    color="primary"
-                    disabled={isCompleted || order.status === 'CANCELLED'}
-                >
-                    Save
-                </Button>
-                <Button
-                    onClick={handleStatusChange}
-                    variant="contained"
-                    color="primary"
-                    disabled={isCompleted || order.status === 'CANCELLED'}
-                >
-                    {getStatusButtonText(order.status)}
-                </Button>
-                <Button
                     onClick={handleCancelOrder}
                     variant="contained"
                     color="error"
                     disabled={isCompleted || order.status === 'CANCELLED'}
                 >
                     Cancel Order
+                </Button>
+                <Button
+                    onClick={handleSaveChanges}
+                    variant="contained"
+                    color="primary"
+                    disabled={isCompleted || order.status === 'CANCELLED'}
+                >
+                    Save
                 </Button>
                 <Button onClick={onClose} variant="contained" color='primary'>
                     Close

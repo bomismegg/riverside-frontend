@@ -13,20 +13,20 @@ import Scrollbar from 'src/components/scrollbar';
 import TableNoData from 'src/sections/user/table-no-data';
 import TableEmptyRows from 'src/sections/user/table-empty-rows';
 
-import CategoryTableRow from './category-table-row';
-import CategoryTableHead from './category-table-head';
-import CategoryTableToolbar from './category-table-toolbar';
+import UserTableRow from './user-table-row';
+import UserTableHead from './user-table-head';
+import UserTableToolbar from './user-table-toolbar';
 import { emptyRows, applyFilter, getComparator } from './utils';
 
-export default function CategoryTableView({ categories, onUpdateCategory, onDeleteCategory }) {
+export default function UserTableView({ users, onUpdateUser, onDeleteUser }) {
     const [loading] = useState(false);
     const [page, setPage] = useState(0);
     const [order, setOrder] = useState('asc');
-    const [orderBy, setOrderBy] = useState('dishCateGoryId');
+    const [orderBy, setOrderBy] = useState('email');
     const [filterName, setFilterName] = useState('');
     const [rowsPerPage, setRowsPerPage] = useState(5);
-    const [selectedCategories, setSelectedCategories] = useState([]);
-
+    const [selectedUsers, setSelectedUsers] = useState([]);
+    
     const handleSort = (event, id) => {
         const isAsc = orderBy === id && order === 'asc';
         setOrder(isAsc ? 'desc' : 'asc');
@@ -48,40 +48,40 @@ export default function CategoryTableView({ categories, onUpdateCategory, onDele
         setFilterName(value);
     };
 
-    const isSelected = (dishCateGoryId) => selectedCategories.includes(dishCateGoryId);
+    const isSelected = (userId) => selectedUsers.includes(userId);
 
-    const handleSelect = (dishCateGoryId) => {
-        const selectedIndex = selectedCategories.indexOf(dishCateGoryId);
+    const handleSelect = (userId) => {
+        const selectedIndex = selectedUsers.indexOf(userId);
         let newSelected = [];
 
         if (selectedIndex === -1) {
-            newSelected = newSelected.concat(selectedCategories, dishCateGoryId);
+            newSelected = newSelected.concat(selectedUsers, userId);
         } else if (selectedIndex === 0) {
-            newSelected = newSelected.concat(selectedCategories.slice(1));
-        } else if (selectedIndex === selectedCategories.length - 1) {
-            newSelected = newSelected.concat(selectedCategories.slice(0, -1));
+            newSelected = newSelected.concat(selectedUsers.slice(1));
+        } else if (selectedIndex === selectedUsers.length - 1) {
+            newSelected = newSelected.concat(selectedUsers.slice(0, -1));
         } else if (selectedIndex > 0) {
             newSelected = newSelected.concat(
-                selectedCategories.slice(0, selectedIndex),
-                selectedCategories.slice(selectedIndex + 1)
+                selectedUsers.slice(0, selectedIndex),
+                selectedUsers.slice(selectedIndex + 1)
             );
         }
 
-        setSelectedCategories(newSelected);
+        setSelectedUsers(newSelected);
     };
 
     const handleSelectAllClick = (event) => {
         if (event.target.checked) {
-            const newSelecteds = categories.map((category) => category.dishCateGoryId);
-            setSelectedCategories(newSelecteds);
+            const newSelecteds = users.map((user) => user.id);
+            setSelectedUsers(newSelecteds);
             return;
         }
-        setSelectedCategories([]);
+        setSelectedUsers([]);
     };
 
 
     const dataFiltered = applyFilter({
-        inputData: categories,
+        inputData: users,
         comparator: getComparator(order, orderBy),
         filterName,
     });
@@ -90,8 +90,8 @@ export default function CategoryTableView({ categories, onUpdateCategory, onDele
 
     return (
         <Card>
-            <CategoryTableToolbar
-                numSelected={selectedCategories.length}
+            <UserTableToolbar
+                numSelected={selectedUsers.length}
                 filterName={filterName}
                 onFilterName={handleFilterByName}
             />
@@ -99,17 +99,21 @@ export default function CategoryTableView({ categories, onUpdateCategory, onDele
             <Scrollbar>
                 <TableContainer sx={{ overflow: 'unset' }}>
                     <Table sx={{ minWidth: 800 }}>
-                        <CategoryTableHead
+                        <UserTableHead
                             order={order}
                             orderBy={orderBy}
                             headLabel={[
-                                { id: 'dishCateGoryId', label: 'ID', alignRight: false },
-                                { id: 'name', label: 'Name', alignRight: false },
-                                { id: 'description', label: 'Description', alignRight: false },
+                                { id: 'fullName', label: 'Name' },
+                                { id: 'email', label: 'Email' },
+                                { id: 'phoneNumber', label: 'Phone' },
+                                { id: 'address', label: 'Address' },
+                                { id: 'role', label: 'Role' },
+                                { id: 'isEnable', label: 'Enabled'},
+                                { id: 'isVerified', label: 'Verified' },
                                 { id: '' },
                             ]}
-                            rowCount={categories.length}
-                            numSelected={selectedCategories.length}
+                            rowCount={users.length}
+                            numSelected={selectedUsers.length}
                             onSelectAllClick={handleSelectAllClick}
                             onRequestSort={handleSort}
                         />
@@ -125,18 +129,18 @@ export default function CategoryTableView({ categories, onUpdateCategory, onDele
 
                             {dataFiltered
                                 .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-                                .map((category) => (
-                                    <CategoryTableRow
-                                        key={category.dishCateGoryId}
-                                        category={category}
-                                        selected={isSelected(category.dishCateGoryId)}
-                                        handleClick={() => handleSelect(category.dishCateGoryId)}
-                                        onUpdateCategory={onUpdateCategory}
-                                        onDeleteCategory={onDeleteCategory}
+                                .map((user) => (
+                                    <UserTableRow
+                                        key={user.id}
+                                        user={user}
+                                        selected={isSelected(user.id)}
+                                        handleClick={() => handleSelect(user.id)}
+                                        onUpdateUser={onUpdateUser}
+                                        onDeleteUser={onDeleteUser}
                                     />
                                 ))}
 
-                            <TableEmptyRows height={72} emptyRows={emptyRows(page, rowsPerPage, categories.length)} />
+                            <TableEmptyRows height={72} emptyRows={emptyRows(page, rowsPerPage, users.length)} />
                             {notFound && <TableNoData query={filterName} />}
                         </TableBody>
                     </Table>
@@ -146,7 +150,7 @@ export default function CategoryTableView({ categories, onUpdateCategory, onDele
             <TablePagination
                 rowsPerPageOptions={[5, 10, 25]}
                 component="div"
-                count={categories.length}
+                count={users.length}
                 rowsPerPage={rowsPerPage}
                 page={page}
                 onPageChange={handleChangePage}
@@ -156,8 +160,9 @@ export default function CategoryTableView({ categories, onUpdateCategory, onDele
     );
 }
 
-CategoryTableView.propTypes = {
-    categories: PropTypes.array.isRequired,
-    onUpdateCategory: PropTypes.func.isRequired,
-    onDeleteCategory: PropTypes.func.isRequired,
+UserTableView.propTypes = {
+    users: PropTypes.array.isRequired,
+    onUpdateUser: PropTypes.func.isRequired,
+    onDeleteUser: PropTypes.func.isRequired,
 };
+

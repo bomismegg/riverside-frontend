@@ -49,6 +49,7 @@ export default function LoginView() {
         });
         return;
       }
+      localStorage.setItem('userId', user.userId);
       localStorage.setItem('displayName', user.fullName);
       localStorage.setItem('email', user.email);
       localStorage.setItem('photoURL', user.imageURL);
