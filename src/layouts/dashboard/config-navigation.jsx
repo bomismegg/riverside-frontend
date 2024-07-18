@@ -28,10 +28,10 @@ const navConfig = [
     icon: icon('ic_order'),
   },
   {
-    title: 'area',
-    path: '/area',
-    icon: icon('ic_area'),
-  }
+    title: 'payment',
+    path: '/payment',
+    icon: icon('ic_payment'),
+  },
 ];
 
 export default navConfig;
