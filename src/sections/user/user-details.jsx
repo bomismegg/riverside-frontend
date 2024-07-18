@@ -1,5 +1,7 @@
 import PropTypes from 'prop-types';
+import { toast } from 'react-toastify';
 import React, { useState } from 'react';
+import 'react-toastify/dist/ReactToastify.css';
 
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import {
@@ -42,13 +44,17 @@ export default function UserDetails({ open, onClose, onSave }) {
 
     const handleSubmit = async () => {
         try {
-            const response = await registerUser(form); // Assuming registerUser is already set up to send JSON
-            if (response.status === 200 || response.status === 201) {
+            const response = await registerUser(form);
+            if (response.content?.responseMessage) {
+                toast.info(response.content.responseMessage);
                 onSave();
                 onClose();
+            } else {
+                toast.error('Unexpected error occurred');
             }
         } catch (error) {
             console.error('Failed to create user:', error);
+            toast.error('Failed to create user');
         }
     };
 

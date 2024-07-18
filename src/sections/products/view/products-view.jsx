@@ -1,4 +1,6 @@
+import 'react-toastify/dist/ReactToastify.css';
 import React, { useState, useEffect } from 'react';
+import { toast, ToastContainer } from 'react-toastify';
 
 import Stack from '@mui/material/Stack';
 import Dialog from '@mui/material/Dialog';
@@ -43,6 +45,7 @@ export default function ProductsView() {
       try {
         const productData = await fetchDishes();
         setProducts(productData);
+        toast.info("Fetched products successfully");
       } catch (error) {
         console.error('Failed to fetch products:', error);
       } finally {
@@ -113,46 +116,45 @@ export default function ProductsView() {
     setIsCreatingNewProduct(false);
   };
 
-
   const handleUpdateProduct = async (updatedProduct) => {
     try {
-        const updatedProductResponse = await updateDish(updatedProduct);
-        const updatedProductIndex = products.findIndex(p => p.dishId === updatedProduct.dishId);
+      const updatedProductResponse = await updateDish(updatedProduct);
+      const updatedProductIndex = products.findIndex(p => p.dishId === updatedProduct.dishId);
 
-        if (updatedProductIndex !== -1) {
-            const updatedProducts = [...products];
-            updatedProducts[updatedProductIndex] = updatedProductResponse;
-            setProducts(updatedProducts);
-        }
-
-        handleCloseDialog();
-    } catch (error) {
-        console.error('Failed to update product:', error);
-    }
-};
-
-
-const handleCreateProduct = async (newProductData) => {
-  const newProductJson = Object.fromEntries(
-    [...newProductData].map((entry) => {
-      if (entry[0] === 'dishPrice') {
-        return [entry[0], Number(entry[1])];
+      if (updatedProductIndex !== -1) {
+        const updatedProducts = [...products];
+        updatedProducts[updatedProductIndex] = updatedProductResponse;
+        setProducts(updatedProducts);
+        toast.success('Product updated successfully!');
       }
-      return entry;
-    })
-  );
 
-  try {
-    const createdProduct = await createDish(newProductJson);
-    setProducts((prevProducts) => [...prevProducts, createdProduct]);
+      handleCloseDialog();
+    } catch (error) {
+      console.error('Failed to update product:', error);
+      toast.error('Failed to update product.');
+    }
+  };
 
-    handleCloseDialog();
-  } catch (error) {
-    console.error('Failed to create product:', error);
-  }
-};
+  const handleCreateProduct = async (newProductData) => {
+    const newProductJson = Object.fromEntries(
+      [...newProductData].map((entry) => {
+        if (entry[0] === 'dishPrice') {
+          return [entry[0], Number(entry[1])];
+        }
+        return entry;
+      })
+    );
 
-
+    try {
+      const createdProduct = await createDish(newProductJson);
+      setProducts((prevProducts) => [...prevProducts, createdProduct]);
+      toast.success('Product created successfully!');
+      handleCloseDialog();
+    } catch (error) {
+      console.error('Failed to create product:', error);
+      toast.error('Failed to create product.');
+    }
+  };
 
   const handleToggleAvailability = async (dishId, newAvailability) => {
     try {
@@ -243,6 +245,7 @@ const handleCreateProduct = async (newProductData) => {
           />
         )}
       </Dialog>
+      <ToastContainer />
     </Container>
   );
 }

@@ -120,7 +120,6 @@ export default function AppView() {
                 {
                   name: 'Revenue',
                   type: 'column',
-                  fill: 'solid',
                   data: monthlyRevenue,
                 },
               ],

@@ -9,6 +9,8 @@ import Divider from '@mui/material/Divider';
 import Typography from '@mui/material/Typography';
 import CardContent from '@mui/material/CardContent';
 
+import { fCurrency } from 'src/utils/format-number';
+
 export default function OrderCard({ order, onShowDetails }) {
     const getStatusColor = (status) => {
         switch (status) {
@@ -56,7 +58,7 @@ export default function OrderCard({ order, onShowDetails }) {
                     Dishes Count: {dishCount}
                     <Typography variant="body2" color="text.secondary">
                     <Typography variant="h6" color="primary" sx={{ fontWeight: 'bold' }}>
-                        Total Price: ${order.totalPrice.toFixed(2)}
+                        Total Price: {fCurrency(order.totalPrice.toFixed(2))}
                     </Typography>
                     </Typography>
                     <Stack direction="row" alignItems="center" spacing={1}>
