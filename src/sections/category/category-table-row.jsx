@@ -12,7 +12,7 @@ import IconButton from '@mui/material/IconButton';
 
 import Iconify from 'src/components/iconify';
 
-export default function CategoryTableRow({ category, selected, handleClick, onShowDetails, onDeleteCategory }) {
+export default function CategoryTableRow({ category, selected, handleClick, onUpdateCategory, onDeleteCategory }) {
     const [open, setOpen] = useState(null);
     const { dishCateGoryId, name, description } = category;
 
@@ -67,7 +67,7 @@ export default function CategoryTableRow({ category, selected, handleClick, onSh
                     sx: { width: 140 },
                 }}
             >
-                <MenuItem onClick={() => { handleCloseMenu(); onShowDetails(dishCateGoryId); }}>
+                <MenuItem onClick={() => { handleCloseMenu(); onUpdateCategory(category); }}>
                     <Iconify icon="eva:edit-fill" sx={{ mr: 2 }} />
                     Edit
                 </MenuItem>
@@ -85,6 +85,6 @@ CategoryTableRow.propTypes = {
     category: PropTypes.object.isRequired,
     selected: PropTypes.bool.isRequired,
     handleClick: PropTypes.func.isRequired,
-    onShowDetails: PropTypes.func.isRequired,
+    onUpdateCategory: PropTypes.func.isRequired,
     onDeleteCategory: PropTypes.func.isRequired,
 };

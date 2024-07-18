@@ -187,7 +187,7 @@ export default function ProductsView() {
   return (
     <Container>
       <Typography variant="h4" sx={{ mb: 5 }}>
-        Products
+        Dishes
       </Typography>
 
       <Stack
@@ -208,14 +208,13 @@ export default function ProductsView() {
             isAvailableOnly={isAvailableOnly}
             onToggleAvailable={handleToggleAvailable}
           />
-          <ProductSort />
           <Button
             variant="contained"
             color="inherit"
             startIcon={<Iconify icon="eva:plus-fill" />}
             onClick={() => handleOpenDialog(null, true)}
           >
-            New Product
+            New Dish
           </Button>
         </Stack>
       </Stack>

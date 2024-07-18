@@ -100,31 +100,7 @@ export default function OrderDetail({ order, onAddDish, onRemoveDish, onComplete
     const calculateTotalPrice = () => localOrderDetails.reduce((total, detail) => total + detail.price * detail.quantity, 0);
 
     const isCompleted = order.status === 'DONE';
-
-    const getStatusButtonText = (status) => {
-        switch (status) {
-            case 'HAVE_NOT_STARTED':
-                return 'Serve All Dishes';
-            case 'IN_PROCESS':
-                return 'Complete Order';
-            case 'DONE':
-                return 'Completed';
-            case 'CANCELLED':
-                return 'Cancelled';
-            default:
-                return '';
-        }
-    };
-
-    const handleStatusChange = () => {
-        if (order.status === 'HAVE_NOT_STARTED') {
-            onCompleteOrder(order.orderId);
-        } else if (order.status === 'IN_PROCESS') {
-            onCompleteOrder(order.orderId);
-        }
-        onClose();
-    };
-
+    
     const handleCancelOrder = () => {
         onCancelOrder(order.orderId);
         onClose();
