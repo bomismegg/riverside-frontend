@@ -15,7 +15,6 @@ import { createDish, updateDish, fetchDishes } from 'src/api/dishes';
 import Iconify from 'src/components/iconify';
 
 import ProductCard from '../product-card';
-import ProductSort from '../product-sort';
 import ProductDetail from '../product-detail';
 import ProductFilters from '../product-filters';
 
