@@ -30,7 +30,6 @@ export default function ProductDetail({ product, isUpdate, onUpdate, open, onClo
         dishCategoryId: product.dishCategoryId,
         ingredients: product.ingredients
     });
-
     const [selectedFile, setSelectedFile] = useState(null);
     const [categories, setCategories] = useState([]);
     const [creatingNewCategory, setCreatingNewCategory] = useState(false);

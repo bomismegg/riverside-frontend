@@ -32,6 +32,11 @@ const navConfig = [
     path: '/payment',
     icon: icon('ic_payment'),
   },
+  {
+    title: 'category',
+    path: '/category',
+    icon: icon('ic_category'),
+  },
 ];
 
 export default navConfig;

@@ -122,7 +122,7 @@ export const sendResetPasswordEmail = async (email) => {
 
 export const activateAccount = async (activationData) => {
   try {
-    const response = await axiosInstance.get(`/account/activate-account/${activationData}`)
+    const response = await axiosInstance.get(`/account/activate-account?confirmToken=${activationData}`)
     return response.data;
   } catch (error) {
     console.error("Error activating account:", error);
