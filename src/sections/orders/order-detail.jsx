@@ -17,6 +17,7 @@ import ListItemAvatar from '@mui/material/ListItemAvatar';
 import { fetchDishes } from 'src/api/dishes';
 
 import DishSelectionDialog from './dish-selection';
+import { fCurrency } from 'src/utils/format-number';
 
 export default function OrderDetail({ order, onAddDish, onRemoveDish, onCompleteOrder, onCancelOrder, onClose, onSaveChanges }) {
     const [availableDishes, setAvailableDishes] = useState([]);
@@ -147,7 +148,7 @@ export default function OrderDetail({ order, onAddDish, onRemoveDish, onComplete
                             </ListItemAvatar>
                             <ListItemText
                                 primary={detail.dishName}
-                                secondary={`Price: $${detail.price.toFixed(2)}`}
+                                secondary={`Price: ${fCurrency(detail.price.toFixed(2))}`}
                                 sx={{ ml: 2 }}
                             />
                             <ButtonGroup variant="" aria-label="outlined primary button group" sx={{ mx: 2 }}>
@@ -173,13 +174,13 @@ export default function OrderDetail({ order, onAddDish, onRemoveDish, onComplete
                 <Divider sx={{ my: 2 }} />
                 <Box>
                     <Typography variant="body1" sx={{ mb: 1 }}>
-                        <strong>Total Price:</strong> ${calculateTotalPrice().toFixed(2)}
+                        <strong>Total Price:</strong> {fCurrency(calculateTotalPrice().toFixed(2))}
                     </Typography>
                     <Typography variant="body1" sx={{ mb: 1 }}>
-                        <strong>Advance:</strong> ${order.advance.toFixed(2)}
+                        <strong>Advance:</strong> {fCurrency(order.advance.toFixed(2))}
                     </Typography>
                     <Typography variant="body1">
-                        <strong>Remaining:</strong> ${order.remaining.toFixed(2)}
+                        <strong>Remaining:</strong> {fCurrency(order.remaining.toFixed(2))}
                     </Typography>
                 </Box>
             </DialogContent>
