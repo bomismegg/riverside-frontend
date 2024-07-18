@@ -43,6 +43,12 @@ export default function LoginView() {
       localStorage.setItem('access_token', access_token);
       localStorage.setItem('refresh_token', refresh_token);
       const user = await fetchUserById(account_id)
+      if (user.role !== "MANAGER") {
+        toast.error(`${user.role} are not allowed to login.`, {
+          position: "top-right",
+        });
+        return;
+      }
       localStorage.setItem('displayName', user.fullName);
       localStorage.setItem('email', user.email);
       localStorage.setItem('photoURL', user.imageURL);
