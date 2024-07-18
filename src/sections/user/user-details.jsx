@@ -47,6 +47,7 @@ export default function UserDetails({ open, onClose, onSave }) {
             const response = await registerUser(form);
             if (response.content?.responseMessage) {
                 toast.info(response.content.responseMessage);
+                toast.info("Default password is 123");
                 onSave();
                 onClose();
             } else {
