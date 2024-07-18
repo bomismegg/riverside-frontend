@@ -1,4 +1,6 @@
 import { useState, useEffect } from 'react';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 import Card from '@mui/material/Card';
 import Stack from '@mui/material/Stack';
@@ -24,8 +26,6 @@ import TableEmptyRows from '../table-empty-rows';
 import UserTableToolbar from '../user-table-toolbar';
 import { emptyRows, applyFilter, getComparator } from '../utils';
 
-// ----------------------------------------------------------------------
-
 export default function UserPage() {
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -42,8 +42,10 @@ export default function UserPage() {
       try {
         const data = await fetchUsers();
         setUsers(data.content);
+        toast.success('Users fetched successfully');
       } catch (error) {
         console.error("Failed to fetch users:", error);
+        toast.error('Failed to fetch users');
       } finally {
         setLoading(false);
       }
@@ -113,6 +115,11 @@ export default function UserPage() {
     setLoading(true);
     fetchUsers().then((data) => {
       setUsers(data.content);
+      setLoading(false);
+      toast.success('User saved successfully');
+    }).catch((error) => {
+      console.error("Failed to save user:", error);
+      toast.error('Failed to save user');
       setLoading(false);
     });
   };
@@ -215,6 +222,7 @@ export default function UserPage() {
         onClose={handleCloseDialog}
         onSave={handleSaveUser}
       />
+      <ToastContainer />
     </Container>
   );
 }
