@@ -22,21 +22,16 @@ const navConfig = [
     path: '/products',
     icon: icon('ic_dishes'),
   },
-  // {
-  //   title: 'blog',
-  //   path: '/blog',
-  //   icon: icon('ic_blog'),
-  // },
   {
-    title: 'login',
-    path: '/login',
-    icon: icon('ic_lock'),
+    title: 'Order',
+    path: '/order',
+    icon: icon('ic_order'),
   },
   {
-    title: 'Not found',
-    path: '/404',
-    icon: icon('ic_disabled'),
-  },
+    title: 'area',
+    path: '/area',
+    icon: icon('ic_area'),
+  }
 ];
 
 export default navConfig;

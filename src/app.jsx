@@ -6,6 +6,9 @@ import { useScrollToTop } from 'src/hooks/use-scroll-to-top';
 import Router from 'src/routes/sections';
 import ThemeProvider from 'src/theme';
 
+import { LocalizationProvider } from '@mui/x-date-pickers';
+import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
+
 // ----------------------------------------------------------------------
 
 export default function App() {
@@ -13,7 +16,9 @@ export default function App() {
 
   return (
     <ThemeProvider>
-      <Router />
+      <LocalizationProvider dateAdapter={AdapterDateFns}>
+        <Router />
+      </LocalizationProvider>
     </ThemeProvider>
   );
 }

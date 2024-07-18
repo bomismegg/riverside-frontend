@@ -1,22 +1,46 @@
+import { useState } from 'react';
 import PropTypes from 'prop-types';
 
 import Box from '@mui/material/Box';
-import Link from '@mui/material/Link';
+import { Link } from '@mui/material';
 import Card from '@mui/material/Card';
+import Menu from '@mui/material/Menu';
 import Stack from '@mui/material/Stack';
+import MenuItem from '@mui/material/MenuItem';
 import Typography from '@mui/material/Typography';
+import IconButton from '@mui/material/IconButton';
 
 import { fCurrency } from 'src/utils/format-number';
 
 import Label from 'src/components/label';
+import Iconify from 'src/components/iconify';
 
-// ----------------------------------------------------------------------
+export default function ProductCard({ product, onEdit, onToggleAvailability }) {
+  const [anchorEl, setAnchorEl] = useState(null);
+  const open = Boolean(anchorEl);
 
-export default function ShopProductCard({ product, onClick }) {
+  const handleClick = (event) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleClose = () => {
+    setAnchorEl(null);
+  };
+
+  const handleEdit = () => {
+    onEdit(product, false);
+    handleClose();
+  };
+
+  const handleToggleAvailability = () => {
+    onToggleAvailability(product.dishId, !product.isAvailable);
+    handleClose();
+  };
+
   const renderStatus = (
     <Label
       variant="filled"
-      color={(product.status === 'sale' && 'error') || 'info'}
+      color={product.isAvailable ? 'success' : 'error'}
       sx={{
         zIndex: 9,
         top: 16,
@@ -25,61 +49,89 @@ export default function ShopProductCard({ product, onClick }) {
         textTransform: 'uppercase',
       }}
     >
-      {product.status}
+      {product.isAvailable ? 'Available' : 'Unavailable'}
     </Label>
   );
 
-  const renderImg = (
-    <Box
-      component="img"
-      alt={product.name}
-      src={product.cover}
-      sx={{
-        top: 0,
-        width: 1,
-        height: 1,
-        objectFit: 'cover',
-        position: 'absolute',
-      }}
-    />
-  );
-
-  const renderPrice = (
-    <Typography variant="subtitle1">
-      <Typography
-        component="span"
-        variant="body1"
-        sx={{
-          color: 'text.disabled',
-          textDecoration: 'line-through',
-        }}
-      >
-        {product.priceSale && fCurrency(product.priceSale)}
-      </Typography>
-      &nbsp;
-      {fCurrency(product.price)}
-    </Typography>
-  );
-
   return (
-    <Card onClick={onClick}>
-      <Box sx={{ pt: '100%', position: 'relative' }}>
-        {product.status && renderStatus}
-        {renderImg}
+    <Card>
+      <Box sx={{ position: 'relative' }}>
+        {renderStatus}
+        <Box sx={{ pt: '100%', position: 'relative' }}>
+          <img
+            alt={product.name}
+            src={product.imageURL}
+            style={{
+              top: 0,
+              width: '100%',
+              height: '100%',
+              objectFit: 'cover',
+              position: 'absolute',
+            }}
+          />
+        </Box>
       </Box>
+
       <Stack spacing={2} sx={{ p: 3 }}>
-        <Link color="inherit" underline="hover" variant="subtitle2" noWrap>
-          {product.name}
+        <Link color="inherit" underline="hover">
+          <Typography variant="subtitle2" noWrap>
+            {product.name}
+          </Typography>
         </Link>
         <Stack direction="row" alignItems="center" justifyContent="space-between">
-          {renderPrice}
+          <Typography variant="subtitle1">
+            {fCurrency(product.dishPrice)}
+          </Typography>
+          <IconButton
+            color="inherit"
+            sx={{
+              position: 'relative',
+            }}
+            onClick={handleClick}
+          >
+            <Iconify icon="eva:more-vertical-fill" />
+          </IconButton>
         </Stack>
       </Stack>
+
+      <Menu
+        anchorEl={anchorEl}
+        open={open}
+        onClose={handleClose}
+        anchorOrigin={{
+          vertical: 'top',
+          horizontal: 'left',
+        }}
+        transformOrigin={{
+          vertical: 'bottom',
+          horizontal: 'left',
+        }}
+        PaperProps={{
+          sx: {
+            px: 1,
+            width: 200,
+            '& .MuiMenuItem-root': {
+              borderRadius: 0.75,
+              typography: 'body2',
+            },
+          },
+        }}
+      >
+        <MenuItem onClick={handleEdit}>
+          <Iconify icon="eva:edit-fill" sx={{ mr: 2, width: 20, height: 20 }} />
+          Edit
+        </MenuItem>
+        <MenuItem onClick={handleToggleAvailability}>
+          <Iconify icon="eva:toggle-fill" sx={{ mr: 2, width: 20, height: 20 }} />
+          {product.isAvailable ? 'Mark Unavailable' : 'Mark Available'}
+        </MenuItem>
+      </Menu>
     </Card>
   );
 }
 
-ShopProductCard.propTypes = {
-  product: PropTypes.object,
-  onClick: PropTypes.func,
+ProductCard.propTypes = {
+  product: PropTypes.object.isRequired,
+  onEdit: PropTypes.func.isRequired,
+  onToggleAvailability: PropTypes.func.isRequired,
 };

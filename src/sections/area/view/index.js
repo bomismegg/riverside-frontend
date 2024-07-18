@@ -1,0 +1,1 @@
+export { default as AreaView } from './area-view';

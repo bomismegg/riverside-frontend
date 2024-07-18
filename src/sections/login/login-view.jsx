@@ -1,4 +1,3 @@
-import axios from 'axios';
 import { useState } from 'react';
 import 'react-toastify/dist/ReactToastify.css';
 import { toast, ToastContainer } from 'react-toastify';
@@ -19,6 +18,7 @@ import InputAdornment from '@mui/material/InputAdornment';
 import { useRouter } from 'src/routes/hooks';
 
 import { bgGradient } from 'src/theme/css';
+import { login, fetchUserById } from 'src/api/user';
 
 import Logo from 'src/components/logo';
 import Iconify from 'src/components/iconify';
@@ -39,15 +39,15 @@ export default function LoginView() {
     setLoading(true);
 
     try {
-      const response = await axios.post('http://localhost:8080/account/login', {
-        email,
-        password,
-      });
-
-      const { access_token, refresh_token } = response.data.content;
+      const response = await login(email, password);
+      const { access_token, refresh_token, account_id } = response.content;
 
       localStorage.setItem('access_token', access_token);
       localStorage.setItem('refresh_token', refresh_token);
+      const user = await fetchUserById(account_id)
+      localStorage.setItem('displayName', user.fullName);
+      localStorage.setItem('email', user.email);
+      localStorage.setItem('photoURL', user.imageURL);
 
       toast.success('Login successful!', {
         position: "top-right"

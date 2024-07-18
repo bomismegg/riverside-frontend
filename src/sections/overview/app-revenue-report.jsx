@@ -8,11 +8,11 @@ import Chart, { useChart } from 'src/components/chart';
 
 // ----------------------------------------------------------------------
 
-export default function AppWebsiteVisits({ title, subheader, chart, ...other }) {
-  const { labels, colors, series, options } = chart;
+export default function AppRevenueReport({ title, subheader, chart, ...other }) {
+  const { labels, series, options } = chart;
 
   const chartOptions = useChart({
-    colors,
+    colors: series.map((s) => s.color),
     plotOptions: {
       bar: {
         columnWidth: '16%',
@@ -23,7 +23,7 @@ export default function AppWebsiteVisits({ title, subheader, chart, ...other }) 
     },
     labels,
     xaxis: {
-      type: 'datetime',
+      type: 'category',
     },
     tooltip: {
       shared: true,
@@ -31,7 +31,7 @@ export default function AppWebsiteVisits({ title, subheader, chart, ...other }) 
       y: {
         formatter: (value) => {
           if (typeof value !== 'undefined') {
-            return `${value.toFixed(0)} visits`;
+            return `${value.toFixed(0)} VND`;
           }
           return value;
         },
@@ -47,7 +47,7 @@ export default function AppWebsiteVisits({ title, subheader, chart, ...other }) 
       <Box sx={{ p: 3, pb: 1 }}>
         <Chart
           dir="ltr"
-          type="line"
+          type="column"
           series={series}
           options={chartOptions}
           width="100%"
@@ -58,7 +58,7 @@ export default function AppWebsiteVisits({ title, subheader, chart, ...other }) 
   );
 }
 
-AppWebsiteVisits.propTypes = {
+AppRevenueReport.propTypes = {
   chart: PropTypes.object,
   subheader: PropTypes.string,
   title: PropTypes.string,
