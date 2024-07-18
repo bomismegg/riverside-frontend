@@ -117,23 +117,30 @@ export default function ProductsView() {
   };
 
   const handleUpdateProduct = async (updatedProduct) => {
+    const newProductJson = Object.fromEntries(
+      [...updatedProduct].map((entry) => {
+        if (entry[0] === 'dishPrice') {
+          return [entry[0], Number(entry[1])];
+        }
+        return entry;
+      })
+    );
     try {
-      const updatedProductResponse = await updateDish(updatedProduct);
-      const updatedProductIndex = products.findIndex(p => p.dishId === updatedProduct.dishId);
-
-      if (updatedProductIndex !== -1) {
-        const updatedProducts = [...products];
-        updatedProducts[updatedProductIndex] = updatedProductResponse;
-        setProducts(updatedProducts);
-        toast.success('Product updated successfully!');
-      }
-
+      await updateDish(newProductJson);
+      toast.success('Product updated successfully!');
       handleCloseDialog();
+      
+      // Refetch products and categories after successful update
+      const productData = await fetchDishes();
+      setProducts(productData);
+      const categoryData = await fetchDishCategories();
+      setCategories(categoryData);
     } catch (error) {
       console.error('Failed to update product:', error);
       toast.error('Failed to update product.');
     }
   };
+  
 
   const handleCreateProduct = async (newProductData) => {
     const newProductJson = Object.fromEntries(
@@ -158,9 +165,18 @@ export default function ProductsView() {
 
   const handleToggleAvailability = async (dishId, newAvailability) => {
     try {
-      // Implement logic to toggle product availability
+      const product = products.find((prod) => prod.dishId === dishId);
+      delete product.imageURL;
+      if (product) {
+        product.isAvailable = newAvailability;
+        await updateDish(product);
+        toast.success('Product availability updated successfully!');
+        const productData = await fetchDishes();
+        setProducts(productData);
+      }
     } catch (error) {
       console.error('Failed to update product availability:', error);
+      toast.error('Failed to update product availability.');
     }
   };
 
