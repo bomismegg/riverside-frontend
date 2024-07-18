@@ -14,10 +14,11 @@ import DialogActions from '@mui/material/DialogActions';
 import { Typography, ButtonGroup } from '@mui/material';
 import ListItemAvatar from '@mui/material/ListItemAvatar';
 
+import { fCurrency } from 'src/utils/format-number';
+
 import { fetchDishes } from 'src/api/dishes';
 
 import DishSelectionDialog from './dish-selection';
-import { fCurrency } from 'src/utils/format-number';
 
 export default function OrderDetail({ order, onAddDish, onRemoveDish, onCompleteOrder, onCancelOrder, onClose, onSaveChanges }) {
     const [availableDishes, setAvailableDishes] = useState([]);

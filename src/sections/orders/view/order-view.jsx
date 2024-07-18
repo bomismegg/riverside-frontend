@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { toast, ToastContainer } from 'react-toastify';
 
 import Stack from '@mui/material/Stack';
 import Dialog from '@mui/material/Dialog';
@@ -34,6 +35,7 @@ export default function OrdersView() {
                     const orderDetails = await fetchOrderDetailsByOrderId(order.orderId);
                     return { ...order, tableName: table.name, areaName: area.name, orderDetails };
                 }));
+                toast.success('Orders fetched successfully');
                 setOrders(tableData);
                 setFilteredOrders(tableData);
             } catch (error) {
@@ -66,7 +68,12 @@ export default function OrdersView() {
             return order;
         });
         setOrders(updatedOrders);
-        await updateOrder({ orderId, orderDetails: updatedOrders.find(order => order.orderId === orderId).orderDetails });
+        const response = await updateOrder({ orderId, orderDetails: updatedOrders.find(order => order.orderId === orderId).orderDetails });
+        if (response.content?.responseMessage) {
+            toast.info(response.content.responseMessage);
+        } else {
+            toast.error('Unexpected error occurred');
+        }
     };
 
     const handleRemoveDish = async (orderId, dishId) => {
@@ -78,7 +85,12 @@ export default function OrdersView() {
             return order;
         });
         setOrders(updatedOrders);
-        await updateOrder({ orderId, orderDetails: updatedOrders.find(order => order.orderId === orderId).orderDetails });
+        const response = await updateOrder({ orderId, orderDetails: updatedOrders.find(order => order.orderId === orderId).orderDetails });
+        if (response.content?.responseMessage) {
+            toast.info(response.content.responseMessage);
+        } else {
+            toast.error('Unexpected error occurred');
+        }
     };
 
     const handleCompleteOrder = async (orderId) => {
@@ -169,6 +181,7 @@ export default function OrdersView() {
                     />
                 )}
             </Dialog>
+            <ToastContainer />
         </Container>
     );
 }
