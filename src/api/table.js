@@ -33,7 +33,7 @@ export const createTable = async (tableData) => {
 export const fetchTableById = async (tableId) => {
     try {
         const response = await axiosInstance.get(`/table/${tableId}`);
-        return response.data;
+        return response.data.content;
     } catch (error) {
         console.error("Error fetching table by ID:", error);
         throw error;

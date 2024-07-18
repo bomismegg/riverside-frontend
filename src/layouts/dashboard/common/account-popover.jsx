@@ -47,6 +47,9 @@ export default function AccountPopover() {
   const handleLogout = () => {
     localStorage.removeItem("access_token");
     localStorage.removeItem("refresh_token");
+    localStorage.removeItem("displayName");
+    localStorage.removeItem("email");
+    localStorage.removeItem("imageURL");
     router.push("/login");
     handleClose();
   };

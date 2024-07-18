@@ -7,8 +7,9 @@ import Container from '@mui/material/Container';
 import Grid from '@mui/material/Unstable_Grid2';
 import Typography from '@mui/material/Typography';
 
-import { fetchOrders } from 'src/api/order';
-import { fetchDishById } from 'src/api/dishes';
+import { fetchAreaById } from 'src/api/area';
+import { fetchTableById } from 'src/api/table';
+import { fetchOrders, updateOrder } from 'src/api/order';
 import { fetchOrderDetailsByOrderId } from 'src/api/order-details';
 
 import OrderCard from '../order-card';
@@ -19,16 +20,22 @@ export default function OrdersView() {
     const [orders, setOrders] = useState([]);
     const [filteredOrders, setFilteredOrders] = useState([]);
     const [loading, setLoading] = useState(true);
-    const [isAvailableOnly, setIsAvailableOnly] = useState(false);
     const [selectedOrder, setSelectedOrder] = useState(null);
     const [openDialog, setOpenDialog] = useState(false);
     const [viewMode, setViewMode] = useState('card');
 
     useEffect(() => {
-        const getOrders = async () => {
+        const fetchData = async () => {
             try {
                 const orderData = await fetchOrders();
-                setOrders(orderData);
+                const tableData = await Promise.all(orderData.map(async (order) => {
+                    const table = await fetchTableById(order.tableId);
+                    const area = await fetchAreaById(table.areaId);
+                    const orderDetails = await fetchOrderDetailsByOrderId(order.orderId);
+                    return { ...order, tableName: table.name, areaName: area.name, orderDetails };
+                }));
+                setOrders(tableData);
+                setFilteredOrders(tableData);
             } catch (error) {
                 console.error('Failed to fetch orders:', error);
             } finally {
@@ -36,40 +43,76 @@ export default function OrdersView() {
             }
         };
 
-        getOrders();
+        fetchData();
     }, []);
 
-    useEffect(() => {
-        let filtered = orders;
+    const handleShowDetails = (orderId) => {
+        const detailedOrder = orders.find(order => order.orderId === orderId);
+        setSelectedOrder(detailedOrder);
+        setOpenDialog(true);
+    };
 
-        if (isAvailableOnly) {
-            filtered = filtered.filter((order) => order.status === 'IN_PROCESS');
-        }
+    const handleAddDish = async (orderId, dishId, quantity) => {
+        const updatedOrders = orders.map(order => {
+            if (order.orderId === orderId) {
+                const existingDetail = order.orderDetails.find(detail => detail.dishId === dishId);
+                if (existingDetail) {
+                    existingDetail.quantity += quantity;
+                } else {
+                    order.orderDetails.push({ dishId, quantity, price: 0, description: '', dishName: '', personSaveId: order.createBy});
+                }
+                order.totalPrice += quantity * 0; 
+            }
+            return order;
+        });
+        setOrders(updatedOrders);
+        await updateOrder({ orderId, orderDetails: updatedOrders.find(order => order.orderId === orderId).orderDetails });
+    };
 
-        setFilteredOrders(filtered);
-    }, [isAvailableOnly, orders]);
+    const handleRemoveDish = async (orderId, dishId) => {
+        const updatedOrders = orders.map(order => {
+            if (order.orderId === orderId) {
+                order.orderDetails = order.orderDetails.filter(detail => detail.dishId !== dishId);
+                order.totalPrice = order.orderDetails.reduce((total, detail) => total + detail.quantity * detail.price, 0);
+            }
+            return order;
+        });
+        setOrders(updatedOrders);
+        await updateOrder({ orderId, orderDetails: updatedOrders.find(order => order.orderId === orderId).orderDetails });
+    };
 
-    const handleShowDetails = async (orderId) => {
+    const handleCompleteOrder = async (orderId) => {
+        const updatedOrders = orders.map(order => {
+            if (order.orderId === orderId) {
+                order.status = 'DONE';
+            }
+            return order;
+        });
+        setOrders(updatedOrders);
+        await updateOrder({ orderId, status: 'DONE' });
+    };
+
+    const handleCancelOrder = async (orderId) => {
+        const updatedOrders = orders.map(order => {
+            if (order.orderId === orderId) {
+                order.status = 'CANCELLED';
+            }
+            return order;
+        });
+        setOrders(updatedOrders);
+        await updateOrder({ orderId, status: 'CANCELLED' });
+    };
+
+    const handleSaveChanges = async (updatedOrder) => {
         try {
-            setLoading(true);
-            const orderDetails = await fetchOrderDetailsByOrderId(orderId);
-
-            const detailedDishes = await Promise.all(orderDetails.map(async (detail) => {
-                const dish = await fetchDishById(detail.dishId);
-                return { ...detail, ...dish };
-            }));
-
-            const detailedOrder = {
-                ...orders.find(order => order.orderId === orderId),
-                dishes: detailedDishes
-            };
-
-            setSelectedOrder(detailedOrder);
-            setOpenDialog(true);
+            await updateOrder(updatedOrder);
+            const updatedOrders = orders.map(order => 
+                order.orderId === updatedOrder.orderId ? updatedOrder : order
+            );
+            setOrders(updatedOrders);
+            setOpenDialog(false);
         } catch (error) {
-            console.error('Failed to fetch order details:', error);
-        } finally {
-            setLoading(false);
+            console.error('Failed to update order:', error);
         }
     };
 
@@ -81,7 +124,7 @@ export default function OrdersView() {
         <Container>
             <Stack direction="row" alignItems="center" justifyContent="space-between" mb={5}>
                 <Typography variant="h4">
-                    {viewMode === 'card' ? 'Active Orders' : 'All Orders'}
+                    {viewMode === 'card' ? 'Active Orders' : 'Orders History'}
                 </Typography>
                 <Button variant="outlined" onClick={() => setViewMode(viewMode === 'card' ? 'table' : 'card')}>
                     {viewMode === 'card' ? 'Switch to Table View' : 'Switch to Card View'}
@@ -89,21 +132,10 @@ export default function OrdersView() {
             </Stack>
 
             {viewMode === 'card' ? (
-                <>
-                    <Stack
-                        direction="row"
-                        alignItems="center"
-                        flexWrap="wrap-reverse"
-                        justifyContent="flex-end"
-                        sx={{ mb: 5 }}
-                    >
-                        <Stack direction="row" spacing={1} flexShrink={0} sx={{ my: 1 }}>
-                            {/* Additional Filters or Controls */}
-                        </Stack>
-                    </Stack>
-
-                    <Grid container spacing={3}>
-                        {filteredOrders.map((order) => (
+                <Grid container spacing={3}>
+                    {filteredOrders
+                        .filter((order) => order.status !== 'DONE')
+                        .map((order) => (
                             <Grid key={order.orderId} xs={12} sm={6} md={3}>
                                 <OrderCard
                                     order={order}
@@ -111,26 +143,32 @@ export default function OrdersView() {
                                 />
                             </Grid>
                         ))}
-                    </Grid>
-
-                    <Dialog
-                        open={openDialog}
-                        onClose={() => setOpenDialog(false)}
-                        aria-labelledby="order-detail-dialog"
-                        maxWidth="lg"
-                        fullWidth
-                    >
-                        {selectedOrder && (
-                            <OrderDetail
-                                order={selectedOrder}
-                                onClose={() => setOpenDialog(false)}
-                            />
-                        )}
-                    </Dialog>
-                </>
+                </Grid>
             ) : (
-                <OrdersTableView orders={orders} />
+                <OrdersTableView
+                    orders={orders.filter((order) => order.status === 'DONE')}
+                    onShowDetails={handleShowDetails}
+                />
             )}
+            <Dialog
+                open={openDialog}
+                onClose={() => setOpenDialog(false)}
+                aria-labelledby="order-detail-dialog"
+                maxWidth="lg"
+                fullWidth
+            >
+                {selectedOrder && (
+                    <OrderDetail
+                        order={selectedOrder}
+                        onAddDish={handleAddDish}
+                        onRemoveDish={handleRemoveDish}
+                        onCompleteOrder={handleCompleteOrder}
+                        onCancelOrder={handleCancelOrder}
+                        onClose={() => setOpenDialog(false)}
+                        onSaveChanges={handleSaveChanges}
+                    />
+                )}
+            </Dialog>
         </Container>
     );
 }

@@ -1,7 +1,5 @@
-// ----------------------------------------------------------------------
-
 export const account = {
-  displayName: 'Tri Dang Ngoc Minh',
-  email: 'tridnm@fpt.com',
-  photoURL: '/assets/images/avatars/avatar_25.jpg',
+    displayName: localStorage.displayName ? localStorage.displayName : '',
+    email: localStorage.email? localStorage.email : '',
+    photoURL: localStorage.imageURL? localStorage.imageURL : '',
 };

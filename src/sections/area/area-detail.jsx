@@ -8,7 +8,7 @@ import DialogActions from '@mui/material/DialogActions';
 
 export default function AreaDetail({ area, onUpdate }) {
     const [name, setName] = useState(area.name);
-    const [isAvailable, setIsAvailable] = useState(area.isAvailable);
+    const [isAvailable] = useState(area.isAvailable);
 
     const handleUpdate = () => {
         onUpdate({ ...area, name, isAvailable });

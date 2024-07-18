@@ -9,8 +9,6 @@ import TableContainer from '@mui/material/TableContainer';
 import TablePagination from '@mui/material/TablePagination';
 import { TableRow, TableCell, CircularProgress } from '@mui/material';
 
-import { fetchOrderDetailsByOrderId } from 'src/api/order-details';
-
 import Scrollbar from 'src/components/scrollbar';
 
 import TableNoData from 'src/sections/user/table-no-data';
@@ -21,15 +19,14 @@ import OrderTableHead from './order-table-head';
 import OrderTableToolbar from './order-table-toolbar';
 import { emptyRows, applyFilter, getComparator } from './utils';
 
-export default function OrdersTableView({ orders }) {
-    const [loading, setLoading] = useState(false);
+export default function OrdersTableView({ orders, onShowDetails }) {
+    const [loading] = useState(false);
     const [page, setPage] = useState(0);
     const [order, setOrder] = useState('asc');
     const [orderBy, setOrderBy] = useState('orderId');
     const [filterName, setFilterName] = useState('');
     const [rowsPerPage, setRowsPerPage] = useState(5);
     const [selectedOrders, setSelectedOrders] = useState([]);
-    const [orderDetails, setOrderDetails] = useState({});
 
     const handleSort = (event, id) => {
         const isAsc = orderBy === id && order === 'asc';
@@ -83,20 +80,6 @@ export default function OrdersTableView({ orders }) {
         setSelectedOrders([]);
     };
 
-    const handleShowDetails = async (orderId) => {
-        try {
-            setLoading(true);
-            const orderDetails = await fetchOrderDetailsByOrderId(orderId);
-            setOrderDetails((prevDetails) => ({
-                ...prevDetails,
-                [orderId]: orderDetails,
-            }));
-        } catch (error) {
-            console.error('Failed to fetch order details:', error);
-        } finally {
-            setLoading(false);
-        }
-    };
 
     const dataFiltered = applyFilter({
         inputData: orders,
@@ -148,8 +131,7 @@ export default function OrdersTableView({ orders }) {
                                             order={order}
                                             selected={isSelected(order.orderId)}
                                             handleClick={() => handleSelect(order.orderId)}
-                                            handleShowDetails={handleShowDetails}
-                                            orderDetails={orderDetails[order.orderId]}
+                                            onShowDetails={onShowDetails}
                                         />
                                     ))
                             )}
@@ -175,4 +157,5 @@ export default function OrdersTableView({ orders }) {
 
 OrdersTableView.propTypes = {
     orders: PropTypes.array.isRequired,
+    onShowDetails: PropTypes.func.isRequired,
 };

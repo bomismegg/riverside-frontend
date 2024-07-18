@@ -18,7 +18,6 @@ import Iconify from 'src/components/iconify';
 export default function ProductCard({ product, onEdit, onToggleAvailability }) {
   const [anchorEl, setAnchorEl] = useState(null);
   const open = Boolean(anchorEl);
-  console.log(product);
 
   const handleClick = (event) => {
     setAnchorEl(event.currentTarget);

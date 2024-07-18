@@ -16,6 +16,7 @@ import { fetchUsers } from 'src/api/user';
 import Iconify from 'src/components/iconify';
 import Scrollbar from 'src/components/scrollbar';
 
+import UserDetails from '../user-details';
 import TableNoData from '../table-no-data';
 import UserTableRow from '../user-table-row';
 import UserTableHead from '../user-table-head';
@@ -34,6 +35,7 @@ export default function UserPage() {
   const [orderBy, setOrderBy] = useState('fullName');
   const [filterName, setFilterName] = useState('');
   const [rowsPerPage, setRowsPerPage] = useState(5);
+  const [openDialog, setOpenDialog] = useState(false);
 
   useEffect(() => {
     const getUsers = async () => {
@@ -99,6 +101,22 @@ export default function UserPage() {
     setFilterName(event.target.value);
   };
 
+  const handleOpenDialog = () => {
+    setOpenDialog(true);
+  };
+
+  const handleCloseDialog = () => {
+    setOpenDialog(false);
+  };
+
+  const handleSaveUser = () => {
+    setLoading(true);
+    fetchUsers().then((data) => {
+      setUsers(data.content);
+      setLoading(false);
+    });
+  };
+
   const dataFiltered = applyFilter({
     inputData: users,
     comparator: getComparator(order, orderBy),
@@ -112,14 +130,14 @@ export default function UserPage() {
       <Stack direction="row" alignItems="center" justifyContent="space-between" mb={5}>
         <Typography variant="h4">Users</Typography>
 
-        <Button variant="contained" color="inherit" startIcon={<Iconify icon="eva:plus-fill" />}>
+        <Button variant="contained" color="inherit" startIcon={<Iconify icon="eva:plus-fill" />} onClick={handleOpenDialog} >
           New User
         </Button>
       </Stack>
 
       <Card>
         <UserTableToolbar
-          numSelected={selected.length} 
+          numSelected={selected.length}
           filterName={filterName}
           onFilterName={handleFilterByName}
         />
@@ -137,6 +155,7 @@ export default function UserPage() {
                 headLabel={[
                   { id: 'fullName', label: 'Name' },
                   { id: 'email', label: 'Email' },
+                  { id: 'address', label: 'Address' },
                   { id: 'role', label: 'Role' },
                   { id: 'isAvailable', label: 'Available', align: 'center' },
                   { id: 'status', label: 'Status' },
@@ -160,7 +179,7 @@ export default function UserPage() {
                         email={row.email}
                         role={row.role}
                         status={row.isEnable ? 'Enabled' : 'Disabled'}
-                        company={row.address}
+                        address={row.address}
                         avatarUrl={row.imageURL}
                         isVerified={row.isAvailable}
                         selected={selected.indexOf(row.fullName) !== -1}
@@ -190,6 +209,12 @@ export default function UserPage() {
           onRowsPerPageChange={handleChangeRowsPerPage}
         />
       </Card>
+
+      <UserDetails
+        open={openDialog}
+        onClose={handleCloseDialog}
+        onSave={handleSaveUser}
+      />
     </Container>
   );
 }

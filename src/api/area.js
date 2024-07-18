@@ -33,7 +33,7 @@ export const createArea = async (areaData) => {
 export const fetchAreaById = async (areaId) => {
     try {
         const response = await axiosInstance.get(`/area/${areaId}`);
-        return response.data;
+        return response.data.content;
     } catch (error) {
         console.error("Error fetching area by ID:", error);
         throw error;

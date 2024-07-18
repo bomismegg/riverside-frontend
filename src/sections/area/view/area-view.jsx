@@ -1,14 +1,17 @@
+/* eslint-disable no-shadow */
 import { useState, useEffect } from 'react';
 
 import Stack from '@mui/material/Stack';
 import Dialog from '@mui/material/Dialog';
+import Button from '@mui/material/Button';
 import Container from '@mui/material/Container';
 import Grid from '@mui/material/Unstable_Grid2';
 import Typography from '@mui/material/Typography';
 
 import { fetchAreas } from 'src/api/area';
+import { fetchTables } from 'src/api/table';
 
-import AreaCard from '../area-card';
+import TableCard from '../table-card';
 import AreaDetail from '../area-detail';
 import AreaFilters from '../area-filters';
 
@@ -25,8 +28,18 @@ export default function AreasView() {
         const getAreas = async () => {
             try {
                 const areaData = await fetchAreas();
-                setAreas(areaData);
-                setFilteredAreas(areaData);
+                const tableData = await fetchTables();
+
+                const areaWithTableNames = areaData.map((area) => ({
+                    ...area,
+                    nameList: area.tableIdList.map((tableId) => {
+                        const table = tableData.find((table) => table.tableId === tableId);
+                        return table ? table.name : null;
+                    })
+                }));
+
+                setAreas(areaWithTableNames);
+                setFilteredAreas(areaWithTableNames);
             } catch (error) {
                 console.error('Failed to fetch areas:', error);
             } finally {
@@ -59,10 +72,6 @@ export default function AreasView() {
         setIsAvailableOnly((prev) => !prev);
     };
 
-    if (loading) {
-        return <div>Loading...</div>;
-    }
-
     const handleUpdateArea = async (updatedArea) => {
         try {
             // Call your API to update the area
@@ -82,28 +91,14 @@ export default function AreasView() {
         }
     };
 
-    const handleToggleAvailability = async (areaId, newAvailability) => {
-        try {
-            // Call the API to update the area availability
-            // const updatedArea = await updateAreaAvailability(areaId, newAvailability);
-
-            // Update the areas state with the new data
-            // setAreas(prevAreas => 
-            //   prevAreas.map(a => 
-            //     a.areaId === areaId ? {...a, isAvailable: newAvailability} : a
-            //   )
-            // );
-
-            // Optionally, you can show a success message to the user
-            // For example, if you're using a snackbar or toast notification:
-            // showNotification('Area availability updated successfully');
-        } catch (error) {
-            console.error('Failed to update area availability:', error);
-
-            // Optionally, show an error message to the user
-            // showNotification('Failed to update area availability', 'error');
-        }
+    const handleAddTable = (areaId) => {
+        // Implement the logic to add a new table
+        console.log('Add table to area:', areaId);
     };
+
+    if (loading) {
+        return <div>Loading...</div>;
+    }
 
     return (
         <Container>
@@ -131,12 +126,25 @@ export default function AreasView() {
 
             <Grid container spacing={3}>
                 {filteredAreas.map((area) => (
-                    <Grid key={area.areaId} xs={12} sm={6} md={3}>
-                        <AreaCard
-                            area={area}
-                            onEdit={handleUpdateArea}
-                            onToggleAvailability={handleToggleAvailability}
-                        />
+                    <Grid key={area.areaId} item xs={12}>
+                        <Typography variant="h6" gutterBottom>
+                            {area.name}
+                        </Typography>
+                        <div style={{ display: 'flex', flexWrap: 'wrap' }}>
+                            {area.nameList.map((tableName) => (
+                                <div key={tableName} style={{ flex: '1 0 10%', boxSizing: 'border-box', padding: '8px' }}>
+                                    <TableCard tableName={tableName} />
+                                </div>
+                            ))}
+                        </div>
+                        <Button
+                            variant="contained"
+                            color="success"
+                            onClick={() => handleAddTable(area.areaId)}
+                            sx={{ mt: 2 }}
+                        >
+                            Add Table
+                        </Button>
                     </Grid>
                 ))}
             </Grid>

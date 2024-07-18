@@ -8,7 +8,7 @@ import Grid from '@mui/material/Unstable_Grid2';
 import Typography from '@mui/material/Typography';
 
 import { fetchDishCategories } from 'src/api/category';
-import { createDish, fetchDishes, updateDish } from 'src/api/dishes';
+import { createDish, updateDish, fetchDishes } from 'src/api/dishes';
 
 import Iconify from 'src/components/iconify';
 

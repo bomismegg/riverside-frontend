@@ -12,14 +12,9 @@ import IconButton from '@mui/material/IconButton';
 
 import Iconify from 'src/components/iconify';
 
-export default function OrderTableRow({
-    order,
-    selected,
-    handleClick,
-}) {
+export default function OrderTableRow({ order, selected, handleClick, onShowDetails }) {
     const [open, setOpen] = useState(null);
-
-    const { orderId, status, tableId, totalPrice, createdDate, haveDeposit } = order;
+    const { orderId, status, totalPrice, createdDate } = order;
 
     const handleOpenMenu = (event) => {
         setOpen(event.currentTarget);
@@ -71,7 +66,7 @@ export default function OrderTableRow({
                     sx: { width: 140 },
                 }}
             >
-                <MenuItem onClick={handleCloseMenu}>
+                <MenuItem onClick={() => { handleCloseMenu(); onShowDetails(orderId); }}>
                     <Iconify icon="eva:edit-fill" sx={{ mr: 2 }} />
                     Edit
                 </MenuItem>
@@ -89,4 +84,5 @@ OrderTableRow.propTypes = {
     order: PropTypes.object.isRequired,
     selected: PropTypes.bool.isRequired,
     handleClick: PropTypes.func.isRequired,
+    onShowDetails: PropTypes.func.isRequired,
 };
