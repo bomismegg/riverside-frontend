@@ -44,7 +44,6 @@ export default function ProductsView() {
       try {
         const productData = await fetchDishes();
         setProducts(productData);
-        toast.info("Fetched products successfully");
       } catch (error) {
         console.error('Failed to fetch products:', error);
       } finally {

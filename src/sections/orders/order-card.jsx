@@ -52,14 +52,14 @@ export default function OrderCard({ order, onShowDetails }) {
                         {order.areaName} - {order.tableName}
                     </Typography>
                     <Divider />
-                    <Typography variant="body2" color="text.secondary">
-                        Order ID: #{order.orderId}
+                    <Typography>
+                        Customer: {order.orderName}
                     </Typography>
                     Dishes Count: {dishCount}
                     <Typography variant="body2" color="text.secondary">
-                    <Typography variant="h6" color="primary" sx={{ fontWeight: 'bold' }}>
-                        Total Price: {fCurrency(order.totalPrice.toFixed(2))}
-                    </Typography>
+                        <Typography variant="h6" color="primary" sx={{ fontWeight: 'bold' }}>
+                            Total Price: {fCurrency(order.totalPrice.toFixed(2))}
+                        </Typography>
                     </Typography>
                     <Stack direction="row" alignItems="center" spacing={1}>
                         <Typography variant="body2" color="text.secondary">
