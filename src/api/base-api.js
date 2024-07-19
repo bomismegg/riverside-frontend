@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const BASE_URL = 'https://sharemebackend.online';
-const TIME_OUT = 1000
+const TIME_OUT = 10000
 
 const getToken = () => localStorage.getItem('access_token');
 
