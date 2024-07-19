@@ -11,8 +11,8 @@ import IconButton from '@mui/material/IconButton';
 import ListItemText from '@mui/material/ListItemText';
 import DialogContent from '@mui/material/DialogContent';
 import DialogActions from '@mui/material/DialogActions';
-import { Typography, ButtonGroup } from '@mui/material';
 import ListItemAvatar from '@mui/material/ListItemAvatar';
+import { Select, MenuItem, Typography, InputLabel, ButtonGroup, FormControl } from '@mui/material';
 
 import { fCurrency } from 'src/utils/format-number';
 
@@ -24,7 +24,8 @@ export default function OrderDetail({ order, onAddDish, onRemoveDish, onComplete
     const [availableDishes, setAvailableDishes] = useState([]);
     const [isDishDialogOpen, setIsDishDialogOpen] = useState(false);
     const [localOrderDetails, setLocalOrderDetails] = useState(order.orderDetails);
-    console.log(order)
+    const [orderStatus, setOrderStatus] = useState(order.status);
+
     useEffect(() => {
         const getDishes = async () => {
             try {
@@ -91,7 +92,8 @@ export default function OrderDetail({ order, onAddDish, onRemoveDish, onComplete
     const handleSaveChanges = () => {
         const updatedOrder = {
             ...order,
-            orderDetails: localOrderDetails
+            orderDetails: localOrderDetails,
+            status: orderStatus
         };
 
         onSaveChanges(updatedOrder);
@@ -150,6 +152,21 @@ export default function OrderDetail({ order, onAddDish, onRemoveDish, onComplete
                 </List>
                 <Divider sx={{ my: 2 }} />
                 <Box>
+                    <FormControl fullWidth sx={{ mt: 2 }}>
+                        <InputLabel id="order-status-label">Order Status</InputLabel>
+                        <Select
+                            labelId="order-status-label"
+                            value={orderStatus}
+                            label="Order Status"
+                            onChange={(e) => setOrderStatus(e.target.value)}
+                            disabled={isCompleted}
+                        >
+                            <MenuItem value="HAVE_NOT_STARTED">Preparing</MenuItem>
+                            <MenuItem value="IN_PROCESS">In Progress</MenuItem>
+                            <MenuItem value="DONE">Done</MenuItem>
+                            <MenuItem value="CANCELLED">Cancelled</MenuItem>
+                        </Select>
+                    </FormControl>
                     <Typography variant="body1" sx={{ mb: 1 }}>
                         <strong>Total Price:</strong> {fCurrency(calculateTotalPrice().toFixed(2))}
                     </Typography>
@@ -199,5 +216,5 @@ OrderDetail.propTypes = {
     onCompleteOrder: PropTypes.func.isRequired,
     onCancelOrder: PropTypes.func.isRequired,
     onClose: PropTypes.func.isRequired,
-    onSaveChanges: PropTypes.func.isRequired, // Add this line
+    onSaveChanges: PropTypes.func.isRequired,
 };
