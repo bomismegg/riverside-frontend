@@ -1,5 +1,6 @@
 import PropTypes from 'prop-types';
-import { BarChart, Bar, XAxis, YAxis, Legend, Tooltip, CartesianGrid, ResponsiveContainer } from 'recharts';
+import { Bar, XAxis, YAxis, Legend, Tooltip, BarChart, CartesianGrid, ResponsiveContainer } from 'recharts';
+
 import { Card, CardHeader } from '@mui/material';
 
 export default function AppRevenueReport({ data, title }) {
